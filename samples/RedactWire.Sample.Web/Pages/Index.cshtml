@@ -1,0 +1,88 @@
+@* SPDX-License-Identifier: Apache-2.0 *@
+@* Copyright 2026 Adam Yang, Object IT Limited, Auckland, NZ *@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "RedactWire — PII tester";
+}
+
+<h1 class="h3 mb-3">RedactWire — PII tester</h1>
+<p class="text-muted">
+    Detector is injected via DI (<code>builder.Services.AddRedactWire(...)</code>).
+    Paste text, pick a culture, and detect.
+</p>
+
+<form method="post">
+    <div class="mb-3">
+        <label class="form-label" for="Input">Text</label>
+        <textarea class="form-control" id="Input" name="Input" rows="5">@Model.Input</textarea>
+    </div>
+    <div class="row g-2 align-items-end">
+        <div class="col-auto">
+            <label class="form-label" for="Culture">Culture</label>
+            <select class="form-select" id="Culture" name="Culture">
+                @foreach (var c in IndexModel.Cultures)
+                {
+                    <option value="@c" selected="@(c == Model.Culture)">@c</option>
+                }
+            </select>
+        </div>
+        <div class="col-auto">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="ShowRedacted"
+                       name="ShowRedacted" value="true" @(Model.ShowRedacted ? "checked" : "") />
+                <label class="form-check-label" for="ShowRedacted">Show redacted output</label>
+            </div>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Detect</button>
+        </div>
+    </div>
+</form>
+
+@if (Model.Result is not null)
+{
+    var r = Model.Result;
+    <hr />
+    <p>
+        <strong>@(r.HasPii ? "PII detected" : "No PII detected")</strong>
+        — @r.AllMatches.Count() match(es).
+    </p>
+
+    @if (Model.Redacted is not null)
+    {
+        <div class="mb-3">
+            <label class="form-label">Redacted</label>
+            <pre class="border rounded bg-light p-2">@Model.Redacted</pre>
+        </div>
+    }
+
+    @if (r.AllMatches.Any())
+    {
+        <table class="table table-sm table-striped">
+            <thead>
+                <tr><th>Severity</th><th>Type</th><th>Value</th><th>Conf</th><th>Rule</th></tr>
+            </thead>
+            <tbody>
+            @foreach (var m in r.AllMatches.OrderByDescending(m => m.Severity).ThenBy(m => m.Start))
+            {
+                <tr>
+                    <td>@m.Severity</td>
+                    <td>@m.Type</td>
+                    <td><code>@m.Value</code></td>
+                    <td>@m.Confidence.ToString("0.00")</td>
+                    <td>@m.Rule</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+
+    @foreach (var c in r.Cultures.Where(c => !c.Supported))
+    {
+        <div class="alert alert-warning py-2">
+            Culture <code>@c.Culture</code> has no rule pack — not evaluated
+            (only invariant rules ran).
+        </div>
+    }
+}

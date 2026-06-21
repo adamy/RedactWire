@@ -1,0 +1,48 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 Adam Yang, Object IT Limited, Auckland, NZ
+
+using System.Globalization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using RedactWire;
+
+namespace RedactWire.Sample.Web.Pages;
+
+public class IndexModel : PageModel
+{
+    private readonly PiiDetector _detector;   // injected singleton (see Program.cs)
+
+    public IndexModel(PiiDetector detector) => _detector = detector;
+
+    [BindProperty]
+    public string? Input { get; set; }
+
+    [BindProperty]
+    public string Culture { get; set; } = "en-US";
+
+    [BindProperty]
+    public bool ShowRedacted { get; set; }
+
+    public PiiResult? Result { get; private set; }
+    public string? Redacted { get; private set; }
+
+    // Cultures the user can pick. "fr-FR" has no pack — demonstrates the Supported flag.
+    public static readonly string[] Cultures = { "en-US", "fr-FR" };
+
+    public void OnGet()
+    {
+        Input ??= "Email john@x.co.nz, SSN 123-45-6789, call (415) 555-0132,\n"
+                + "card 4242 4242 4242 4242, 123 Main St, Springfield, IL 62704";
+    }
+
+    public void OnPost()
+    {
+        if (string.IsNullOrWhiteSpace(Input)) return;
+
+        var ci = new CultureInfo(Culture);
+        Result = _detector.Detect(Input, ci);
+
+        if (ShowRedacted)
+            Redacted = Result.Redact(new RedactionOptions { Mode = RedactionMode.Label });
+    }
+}

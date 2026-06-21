@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/samples/">
+    <Project Path="samples/RedactWire.Sample.Web/RedactWire.Sample.Web.csproj" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/RedactWire.Cli/RedactWire.Cli.csproj" />
     <Project Path="src/RedactWire/RedactWire.csproj" />

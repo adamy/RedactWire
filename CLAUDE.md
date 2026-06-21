@@ -22,9 +22,17 @@
   namespace). Use `Redactor.Detect/HasPii/Redact` for zero-config calls.
 
 ## Architecture
-- Core library (`src/RedactWire`) targets **netstandard2.0** with **zero dependencies**.
-- Library must be usable with no DI/host bootstrap (static `Redactor`) AND via
-  `PiiDetectorBuilder` for configuration.
+- Core library (`src/RedactWire`) targets **netstandard2.0**. Its only dependency is
+  `Microsoft.Extensions.DependencyInjection.Abstractions` (contracts-only), so the DI
+  bootstrap can ship in the core package instead of a separate NuGet (we deliberately
+  keep the package count low). No other runtime dependencies.
+- Three ways to use it:
+  1. Static `Redactor` facade — zero bootstrap.
+  2. `PiiDetectorBuilder` — manual configuration.
+  3. DI: `services.AddRedactWire(b => b.AddCulture(...))` registers a singleton
+     `PiiDetector` (extension in `ServiceCollectionExtensions.cs`, namespace
+     `Microsoft.Extensions.DependencyInjection`).
+- `samples/RedactWire.Sample.Web` — ASP.NET Core Razor Pages PII tester (uses the DI path).
 - Per-country rule packs are grouped by country: files under
   `Rules/Localized/<CountryCode>/` with namespace `RedactWire.Rules.Localized.<CountryCode>`
   (e.g. `EnUs/` → `RedactWire.Rules.Localized.EnUs`). Use the culture code with the hyphen
