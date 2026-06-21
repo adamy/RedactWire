@@ -22,10 +22,14 @@
   namespace). Use `Redactor.Detect/HasPii/Redact` for zero-config calls.
 
 ## Architecture
-- Core library (`src/RedactWire`) targets **netstandard2.0**. Its only dependency is
-  `Microsoft.Extensions.DependencyInjection.Abstractions` (contracts-only), so the DI
-  bootstrap can ship in the core package instead of a separate NuGet (we deliberately
-  keep the package count low). No other runtime dependencies.
+- Core library (`src/RedactWire`) multi-targets **net8.0;netstandard2.0**. Dependencies:
+  `Microsoft.Extensions.DependencyInjection.Abstractions` (contracts-only, both TFMs) so
+  the DI bootstrap ships in core; `System.Text.Json` only on netstandard2.0 (built into
+  net8). We deliberately keep the package count low — no separate extension NuGets.
+- Structured scanning lives in `Structured/`: `DetectJson` (System.Text.Json),
+  `DetectXml` (System.Xml, **XXE-safe**: DtdProcessing.Prohibit + null resolver),
+  `DetectObject` (reflection; cycle detection, depth cap, collections, skips framework
+  types). All are extension methods on `PiiDetector`; string values only.
 - Three ways to use it:
   1. Static `Redactor` facade — zero bootstrap.
   2. `PiiDetectorBuilder` — manual configuration.

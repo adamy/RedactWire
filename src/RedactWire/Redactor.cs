@@ -35,4 +35,16 @@ public static class Redactor
     public static string Redact(string text, RedactionOptions? options = null,
         params CultureInfo[] cultures) =>
         Default.Detect(text, cultures).Redact(options);
+
+    /// <summary>Scan a JSON string; matches are located by JSONPath.</summary>
+    public static IReadOnlyList<StructuredPiiMatch> DetectJson(string json, params CultureInfo[] cultures) =>
+        Default.DetectJson(json, cultures);
+
+    /// <summary>Scan an XML string; matches are located by XPath. Parsed safely (no XXE).</summary>
+    public static IReadOnlyList<StructuredPiiMatch> DetectXml(string xml, params CultureInfo[] cultures) =>
+        Default.DetectXml(xml, cultures);
+
+    /// <summary>Scan an object graph; matches are located by property path.</summary>
+    public static IReadOnlyList<StructuredPiiMatch> DetectObject(object? graph, params CultureInfo[] cultures) =>
+        Default.DetectObject(graph, cultures);
 }

@@ -25,6 +25,9 @@ that drives overlap resolution.
 - **Severity model** (`Critical > High > Medium > Low`): the primary key for overlap
   resolution — a higher-severity match wins over an overlapping lower-severity one,
   even at lower confidence.
+- **Structured scanning:** detect PII inside **JSON**, **XML**, and **object graphs**,
+  with each hit located by JSONPath / XPath / property path. Standard libraries only
+  (`System.Text.Json`, `System.Xml`, reflection); XML is parsed safely (no XXE).
 - **Redaction:** mask (length-preserving), remove, type-label, or a custom replacement.
 - **Honest "no PII":** a requested culture with no rule pack is flagged
   `Supported = false` instead of silently "passing".
@@ -98,6 +101,29 @@ r.Redact();                                                  // "SSN ***********
 r.Redact(new RedactionOptions { Mode = RedactionMode.Label }); // "SSN [SocialSecurity]"
 r.Redact(new RedactionOptions { Custom = m => $"<{m.Type}>" });
 ```
+
+## Structured scanning (JSON / XML / objects)
+
+Scan structured data and get each match with its location. Available on `PiiDetector`
+(and the static `Redactor`).
+
+```csharp
+foreach (var h in Redactor.DetectJson("""{"user":{"email":"a@b.com"},"ssn":"123-45-6789"}"""))
+    Console.WriteLine($"{h.Path}: {h.Match.Type}");
+// $.user.email: Email
+// $.ssn: SocialSecurity
+
+Redactor.DetectXml("<u email=\"a@b.com\"/>");   // -> /u/@email
+Redactor.DetectObject(myPoco);                  // -> User.Contacts[0].Phone
+```
+
+Notes:
+- Only **string** values are scanned (a number that lost its formatting isn't reliable PII).
+- XML is parsed with DTD processing prohibited and no external resolver — **XXE-safe**.
+- Object scanning walks public properties/fields, handles collections/dictionaries,
+  detects cycles, caps depth, and does not recurse into framework types.
+- `System.Text.Json` is built into modern .NET; on `netstandard2.0`/.NET Framework it
+  comes as a NuGet dependency (the library multi-targets so net8+ stays clean).
 
 ## Extending
 
