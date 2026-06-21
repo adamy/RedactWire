@@ -38,7 +38,7 @@ public sealed class PiiDetector
         var requested = cultures.Length > 0 ? cultures : _defaultCultures;
 
         // 1) invariant rules always run
-        var invMatches = Resolve(_invariantRules.SelectMany(r => r.Find(text, "invariant")));
+        var invMatches = Resolve(RunRules(_invariantRules, text, "invariant"));
         var invariant = new CulturePiiResult("invariant", invMatches,
             _invariantRules.Select(r => r.Name).ToList());
 
@@ -49,7 +49,7 @@ public sealed class PiiDetector
             var rules = ResolveRulesFor(ci);
             var name = ci.Name;
             var supported = rules.Count > 0;
-            var matches = Resolve(rules.SelectMany(r => r.Find(text, name)));
+            var matches = Resolve(RunRules(rules, text, name));
             perCulture.Add(new CulturePiiResult(name, matches, rules.Select(r => r.Name).ToList())
             {
                 Supported = supported,
@@ -57,6 +57,16 @@ public sealed class PiiDetector
         }
 
         return new PiiResult(text, perCulture, invariant);
+    }
+
+    // Run rules and stamp each raw hit with culture, rule id, and a severity fallback.
+    private static IEnumerable<PiiMatch> RunRules(
+        IReadOnlyList<IPiiRule> rules, string text, string culture)
+    {
+        foreach (var rule in rules)
+            foreach (var h in rule.Find(text))
+                yield return new PiiMatch(rule.Type, h.Value, h.Start, h.Length, h.Confidence,
+                    $"{culture}:{rule.Name}", culture, h.Severity ?? PiiSeverities.For(rule.Type));
     }
 
     private IReadOnlyList<IPiiRule> ResolveRulesFor(CultureInfo ci)

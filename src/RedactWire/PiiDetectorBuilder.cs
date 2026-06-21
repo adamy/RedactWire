@@ -16,6 +16,7 @@ public sealed class PiiDetectorBuilder
 {
     private readonly List<IPiiRule> _invariant = new();
     private readonly Dictionary<string, List<IPiiRule>> _culture = new(StringComparer.OrdinalIgnoreCase);
+    private readonly List<IPiiRule> _allCultureRules = new();
     private readonly List<CultureInfo> _defaults = new();
     private OverlapStrategy _overlap = OverlapStrategy.KeepHighestConfidence;
 
@@ -50,6 +51,16 @@ public sealed class PiiDetectorBuilder
         return this;
     }
 
+    /// <summary>Add a custom rule to every configured culture (those added via
+    /// <see cref="AddCulture"/>). Bound at <see cref="Build"/>, so call order vs
+    /// <see cref="AddCulture"/> does not matter. For an always-on rule independent of
+    /// culture, use <see cref="AddInvariantRule"/> instead.</summary>
+    public PiiDetectorBuilder AddRule(IPiiRule rule)
+    {
+        _allCultureRules.Add(rule);
+        return this;
+    }
+
     /// <summary>Add a custom culture-agnostic rule (always runs).</summary>
     public PiiDetectorBuilder AddInvariantRule(IPiiRule rule)
     {
@@ -66,6 +77,12 @@ public sealed class PiiDetectorBuilder
     public PiiDetector Build()
     {
         if (_defaults.Count == 0) _defaults.Add(CultureInfo.CurrentCulture);
+
+        // Bind "all configured cultures" rules to every configured culture's bucket.
+        if (_allCultureRules.Count > 0)
+            foreach (var ci in _defaults)
+                GetBucket(ci.Name).AddRange(_allCultureRules);
+
         var frozen = _culture.ToDictionary(
             kv => kv.Key, kv => (IReadOnlyList<IPiiRule>)kv.Value,
             StringComparer.OrdinalIgnoreCase);

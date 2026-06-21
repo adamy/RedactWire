@@ -127,16 +127,42 @@ Notes:
 
 ## Extending
 
-Add a custom rule for a culture without touching the library:
+Add a custom rule without touching the library. Most needs are covered by `RegexRule`:
 
 ```csharp
 var detector = PiiDetectorBuilder.CreateDefault()
     .AddCulture(new CultureInfo("en-US"))
-    .AddRule(new CultureInfo("en-US"),
+    .AddRule(new CultureInfo("en-US"),                 // bind to one culture
         new RegexRule("EmployeeId", PiiType.NationalId,
             @"(?<v>\bEMP\d{6}\b)",
             baseConfidence: 0.8,
-            severity: PiiSeverity.Critical))
+            severity: PiiSeverity.Critical))           // optional; defaults from the type
+    .AddInvariantRule(myGlobalRule)                    // always-on, culture-agnostic
+    .Build();
+```
+
+For anything beyond a single regex, implement `IPiiRule`. A rule only reports raw
+`RuleHit`s — the engine stamps the culture, the rule id, and the severity default, so
+there's no plumbing to get wrong:
+
+```csharp
+public sealed class MyRule : IPiiRule
+{
+    public string Name => "MyRule";
+    public PiiType Type => PiiType.NationalId;
+
+    public IEnumerable<RuleHit> Find(string text)
+    {
+        // ... locate a match ...
+        yield return new RuleHit(value, start, length, confidence: 0.9);
+        // (pass a PiiSeverity to override the type default)
+    }
+}
+
+var detector = PiiDetectorBuilder.CreateDefault()
+    .AddCulture(new CultureInfo("en-US"))
+    .AddCulture(new CultureInfo("en-GB"))
+    .AddRule(new MyRule())   // bind to every configured culture at once
     .Build();
 ```
 

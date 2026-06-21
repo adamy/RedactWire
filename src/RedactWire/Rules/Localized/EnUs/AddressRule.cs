@@ -37,7 +37,7 @@ public sealed class AddressRule : IPiiRule
     private const double ConfStreetOnly = 0.45;
     private const double ConfCityOnly = 0.5;
 
-    public IEnumerable<PiiMatch> Find(string text, string culture)
+    public IEnumerable<RuleHit> Find(string text)
     {
         var streets = Street.Matches(text).Cast<Match>().ToList();
         var cities = CityStateZip.Matches(text).Cast<Match>()
@@ -63,11 +63,11 @@ public sealed class AddressRule : IPiiRule
                 var c = cities[ci];
                 int start = s.Index;
                 int len = c.Index + c.Length - start;
-                yield return Match(text.Substring(start, len), start, len, ConfFull, culture);
+                yield return new RuleHit(text.Substring(start, len), start, len, ConfFull);
             }
             else
             {
-                yield return Match(s.Value, s.Index, s.Length, ConfStreetOnly, culture);
+                yield return new RuleHit(s.Value, s.Index, s.Length, ConfStreetOnly);
             }
         }
 
@@ -75,11 +75,7 @@ public sealed class AddressRule : IPiiRule
         {
             if (usedCity[i]) continue;
             var c = cities[i];
-            yield return Match(c.Value, c.Index, c.Length, ConfCityOnly, culture);
+            yield return new RuleHit(c.Value, c.Index, c.Length, ConfCityOnly);
         }
     }
-
-    private PiiMatch Match(string value, int start, int len, double conf, string culture) =>
-        new(PiiType.Address, value, start, len, conf, $"{culture}:{Name}", culture,
-            PiiSeverities.For(PiiType.Address));
 }

@@ -43,8 +43,13 @@
   removed and PascalCased (`en-US` → `EnUs`). Register the pack in `DefaultRules.ByCulture`.
 - Rule docs live in `docs/rules/` (`common.md` + `localized/<culture>.md`); each rule has
   a Severity column. Severity model: `docs/rules/severity.md`.
-- Detection rules implement `IPiiRule`; most are `RegexRule`. Checksums gate matches
-  (a failed checksum drops the candidate, never emits a low-confidence match).
+- Detection rules implement `IPiiRule`; most are `RegexRule`. A rule reports raw
+  `RuleHit`s (value/start/length/confidence + optional severity); the **engine** stamps
+  culture, rule id (`"culture:Name"`), and the severity default — rules never do that
+  plumbing. Checksums gate matches (a failed checksum drops the candidate, never emits a
+  low-confidence match).
+- Builder rule registration: `AddRule(culture, rule)` (one culture), `AddRule(rule)`
+  (all configured cultures, bound at `Build`), `AddInvariantRule(rule)` (always-on).
 - Overlap resolution is severity-first, then the chosen `OverlapStrategy`.
 
 ## Testing
