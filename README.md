@@ -166,6 +166,19 @@ var detector = PiiDetectorBuilder.CreateDefault()
     .Build();
 ```
 
+### Custom PII types
+
+`PiiType` is an enum (enums can't be extended). For a type that isn't in the list, use
+`PiiType.Custom` and give it a real name via `RuleHit.Subtype` — the name flows into the
+match and into redaction labels:
+
+```csharp
+yield return new RuleHit(value, start, length, 0.9,
+    Severity: PiiSeverity.Critical, Subtype: "NhiNumber");
+// match.Type == PiiType.Custom, match.Subtype == "NhiNumber"
+// Redact(Label)  ->  "[NhiNumber]"
+```
+
 ## Scope & roadmap
 
 - **Names and addresses by NER** are out of the core (regex floods false positives). The

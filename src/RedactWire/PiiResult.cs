@@ -48,13 +48,31 @@ public sealed record PiiMatch(
     double Confidence,
     string Rule,            // "en-US:SSN", "invariant:Email", ...
     string Culture,         // owning culture, or "invariant"
-    PiiSeverity Severity);  // how sensitive — drives overlap resolution
+    PiiSeverity Severity,   // how sensitive — drives overlap resolution
+    string? Subtype = null);// custom type name (for PiiType.Custom); else null
 
 public enum PiiType
 {
-    Phone, NationalId, DriverLicense, Passport, TaxId, PostalCode, BankAccount,
-    Email, CreditCard, IpAddress, Iban,
-    SocialSecurity,                 // SSN — distinct from TaxId
-    Address,                        // active (composite regex, US)
-    Person, Organization            // semantic — reserved for the optional NER ext
+    // Default severity declared per member; resolved by PiiSeverities.
+    // See docs/rules/severity.md.
+    [DefaultSeverity(PiiSeverity.High)] Phone,
+    [DefaultSeverity(PiiSeverity.Critical)] NationalId,
+    [DefaultSeverity(PiiSeverity.Critical)] DriverLicense,
+    [DefaultSeverity(PiiSeverity.Critical)] Passport,
+    [DefaultSeverity(PiiSeverity.Critical)] TaxId,
+    [DefaultSeverity(PiiSeverity.Medium)] PostalCode,
+    [DefaultSeverity(PiiSeverity.Critical)] BankAccount,
+    [DefaultSeverity(PiiSeverity.High)] Email,
+    [DefaultSeverity(PiiSeverity.Critical)] CreditCard,
+    [DefaultSeverity(PiiSeverity.Medium)] IpAddress,
+    [DefaultSeverity(PiiSeverity.Critical)] Iban,
+    [DefaultSeverity(PiiSeverity.Critical)] SocialSecurity,   // SSN — distinct from TaxId
+    [DefaultSeverity(PiiSeverity.High)] Address,             // active (composite regex, US)
+    // semantic — reserved for the optional NER ext
+    [DefaultSeverity(PiiSeverity.High)] Person,
+    [DefaultSeverity(PiiSeverity.Low)] Organization,
+
+    // Escape hatch: a consumer PII type that doesn't fit the above (enums can't be
+    // extended). Pair with RuleHit.Subtype for a real name and override the severity.
+    [DefaultSeverity(PiiSeverity.Medium)] Custom,
 }

@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2026 Adam Yang, Object IT Limited, Auckland, NZ
 
+using System.Reflection;
+
 namespace RedactWire;
 
 /// <summary>How sensitive a PII type is. Drives overlap resolution: a higher-severity
@@ -14,39 +16,37 @@ public enum PiiSeverity
     Critical = 3,
 }
 
-/// <summary>Default severity per <see cref="PiiType"/>. A rule may override its own
-/// severity at construction; this is the fallback when it doesn't.
+/// <summary>Declares the default <see cref="PiiSeverity"/> for a <see cref="PiiType"/>
+/// member. Kept on the enum so the severity lives next to the value it describes.</summary>
+[AttributeUsage(AttributeTargets.Field)]
+public sealed class DefaultSeverityAttribute : Attribute
+{
+    public DefaultSeverityAttribute(PiiSeverity severity) => Severity = severity;
+    public PiiSeverity Severity { get; }
+}
+
+/// <summary>Resolves the default severity for a <see cref="PiiType"/> from its
+/// <see cref="DefaultSeverityAttribute"/>. A rule may override per match
+/// (<see cref="RuleHit.Severity"/>); this is the fallback when it doesn't.
 /// See <c>docs/rules/severity.md</c>.</summary>
 public static class PiiSeverities
 {
-    private static readonly IReadOnlyDictionary<PiiType, PiiSeverity> Map =
-        new Dictionary<PiiType, PiiSeverity>
-        {
-            // Critical — direct identity / financial keys
-            [PiiType.SocialSecurity] = PiiSeverity.Critical,
-            [PiiType.NationalId]     = PiiSeverity.Critical,
-            [PiiType.CreditCard]     = PiiSeverity.Critical,
-            [PiiType.BankAccount]    = PiiSeverity.Critical,
-            [PiiType.Iban]           = PiiSeverity.Critical,
-            [PiiType.Passport]       = PiiSeverity.Critical,
-            [PiiType.DriverLicense]  = PiiSeverity.Critical,
-            [PiiType.TaxId]          = PiiSeverity.Critical,
+    // Read the attributes once (reflection) and cache, so For() stays O(1).
+    private static readonly IReadOnlyDictionary<PiiType, PiiSeverity> Map = BuildMap();
 
-            // High — strong contact / locating identifiers
-            [PiiType.Email]   = PiiSeverity.High,
-            [PiiType.Phone]   = PiiSeverity.High,
-            [PiiType.Address] = PiiSeverity.High,
-            [PiiType.Person]  = PiiSeverity.High,
-
-            // Medium — quasi-identifiers
-            [PiiType.IpAddress]  = PiiSeverity.Medium,
-            [PiiType.PostalCode] = PiiSeverity.Medium,
-
-            // Low
-            [PiiType.Organization] = PiiSeverity.Low,
-        };
-
-    /// <summary>Default severity for a type (Medium if unmapped).</summary>
+    /// <summary>Default severity for a type (Medium if none is declared).</summary>
     public static PiiSeverity For(PiiType type) =>
         Map.TryGetValue(type, out var s) ? s : PiiSeverity.Medium;
+
+    private static Dictionary<PiiType, PiiSeverity> BuildMap()
+    {
+        var map = new Dictionary<PiiType, PiiSeverity>();
+        foreach (var field in typeof(PiiType).GetFields(BindingFlags.Public | BindingFlags.Static))
+        {
+            var value = (PiiType)field.GetValue(null)!;
+            var attr = field.GetCustomAttribute<DefaultSeverityAttribute>();
+            map[value] = attr?.Severity ?? PiiSeverity.Medium;
+        }
+        return map;
+    }
 }

@@ -79,6 +79,46 @@ public class ExtensibilityTests
         Assert.All(r.Cultures, c => Assert.Contains(c.Matches, m => m.Rule.EndsWith(":Token")));
     }
 
+    // A consumer PII type that doesn't fit the enum: use PiiType.Custom + a Subtype name.
+    private sealed class NhiRule : IPiiRule
+    {
+        public string Name => "NhiNumber";
+        public PiiType Type => PiiType.Custom;
+
+        public IEnumerable<RuleHit> Find(string text)
+        {
+            int i = text.IndexOf("ABC1234", StringComparison.Ordinal);
+            if (i >= 0)
+                yield return new RuleHit("ABC1234", i, 7, 0.9,
+                    Severity: PiiSeverity.Critical, Subtype: "NhiNumber");
+        }
+    }
+
+    [Fact]
+    public void Custom_type_carries_subtype_and_severity()
+    {
+        var d = PiiDetectorBuilder.CreateEmpty()
+            .AddRule(Ci("en-NZ"), new NhiRule())
+            .Build();
+
+        var m = Assert.Single(d.Detect("patient ABC1234", Ci("en-NZ")).Cultures.Single().Matches);
+        Assert.Equal(PiiType.Custom, m.Type);
+        Assert.Equal("NhiNumber", m.Subtype);
+        Assert.Equal(PiiSeverity.Critical, m.Severity);
+    }
+
+    [Fact]
+    public void Custom_type_redaction_label_uses_subtype()
+    {
+        var d = PiiDetectorBuilder.CreateEmpty()
+            .AddRule(Ci("en-NZ"), new NhiRule())
+            .Build();
+
+        var redacted = d.Detect("patient ABC1234", Ci("en-NZ"))
+            .Redact(new RedactionOptions { Mode = RedactionMode.Label });
+        Assert.Equal("patient [NhiNumber]", redacted);
+    }
+
     [Fact]
     public void AddRule_all_cultures_is_order_independent()
     {

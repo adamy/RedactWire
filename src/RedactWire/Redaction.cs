@@ -58,7 +58,7 @@ public static class Redaction
         return o.Mode switch
         {
             RedactionMode.Remove => string.Empty,
-            RedactionMode.Label => $"[{m.Type}]",
+            RedactionMode.Label => $"[{m.Subtype ?? m.Type.ToString()}]",
             _ => new string(o.MaskChar, m.Length),
         };
     }

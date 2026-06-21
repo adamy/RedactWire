@@ -50,6 +50,9 @@
   low-confidence match).
 - Builder rule registration: `AddRule(culture, rule)` (one culture), `AddRule(rule)`
   (all configured cultures, bound at `Build`), `AddInvariantRule(rule)` (always-on).
+- `PiiType` is a fixed enum (enums aren't extensible). For consumer types that don't fit,
+  use `PiiType.Custom` + `RuleHit.Subtype` (the name); it flows to `PiiMatch.Subtype` and
+  redaction labels (`[Subtype ?? Type]`).
 - Overlap resolution is severity-first, then the chosen `OverlapStrategy`.
 
 ## Testing

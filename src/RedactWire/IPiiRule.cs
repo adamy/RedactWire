@@ -21,8 +21,11 @@ namespace RedactWire;
 /// <param name="Length">Length of the match.</param>
 /// <param name="Confidence">Confidence in [0,1].</param>
 /// <param name="Severity">Optional override; null = use the type's default severity.</param>
+/// <param name="Subtype">Optional human name for the match, mainly for
+/// <see cref="PiiType.Custom"/> (e.g. "NhiNumber"). Surfaces in redaction labels.</param>
 public readonly record struct RuleHit(
-    string Value, int Start, int Length, double Confidence, PiiSeverity? Severity = null);
+    string Value, int Start, int Length, double Confidence,
+    PiiSeverity? Severity = null, string? Subtype = null);
 
 /// <summary>A detection rule. The single extension point: consumers and the future
 /// NER package implement this. A rule reports raw <see cref="RuleHit"/>s; it does not
@@ -45,6 +48,7 @@ public sealed class RegexRule : IPiiRule
     private readonly Func<string, (bool ok, double confidence)>? _validate;
     private readonly double _baseConfidence;
     private readonly PiiSeverity? _severity;
+    private readonly string? _subtype;
 
     public string Name { get; }
     public PiiType Type { get; }
@@ -53,6 +57,7 @@ public sealed class RegexRule : IPiiRule
         double baseConfidence = 0.6,
         Func<string, (bool, double)>? validate = null,
         PiiSeverity? severity = null,
+        string? subtype = null,
         RegexOptions options = RegexOptions.Compiled | RegexOptions.CultureInvariant)
     {
         Name = name;
@@ -61,6 +66,7 @@ public sealed class RegexRule : IPiiRule
         _baseConfidence = baseConfidence;
         _validate = validate;
         _severity = severity;   // null → engine fills from the type default
+        _subtype = subtype;
     }
 
     public IEnumerable<RuleHit> Find(string text)
@@ -78,7 +84,7 @@ public sealed class RegexRule : IPiiRule
                 confidence = conf;
             }
 
-            yield return new RuleHit(g.Value, g.Index, g.Length, confidence, _severity);
+            yield return new RuleHit(g.Value, g.Index, g.Length, confidence, _severity, _subtype);
         }
     }
 }

@@ -66,7 +66,8 @@ public sealed class PiiDetector
         foreach (var rule in rules)
             foreach (var h in rule.Find(text))
                 yield return new PiiMatch(rule.Type, h.Value, h.Start, h.Length, h.Confidence,
-                    $"{culture}:{rule.Name}", culture, h.Severity ?? PiiSeverities.For(rule.Type));
+                    $"{culture}:{rule.Name}", culture, h.Severity ?? PiiSeverities.For(rule.Type),
+                    h.Subtype);
     }
 
     private IReadOnlyList<IPiiRule> ResolveRulesFor(CultureInfo ci)

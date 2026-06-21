@@ -15,8 +15,11 @@ Higher enum value = more severe: `Critical(3) > High(2) > Medium(1) > Low(0)`.
 | **High** | Email, Phone, Address, Person |
 | **Medium** | IpAddress, PostalCode |
 | **Low** | Organization |
+| (default Medium) | Custom — consumer-defined types; override per rule |
 
-Source of truth: `PiiSeverities.For(PiiType)` in `src/RedactWire/PiiSeverity.cs`.
+Source of truth: a `[DefaultSeverity(...)]` attribute on each `PiiType` member
+(`src/RedactWire/PiiResult.cs`). `PiiSeverities.For(PiiType)` reads those attributes
+once (cached) — so the severity lives next to the value it describes.
 
 ## Overriding
 
