@@ -76,17 +76,29 @@ public sealed class PiiDetectorBuilder
 
     public PiiDetector Build()
     {
-        if (_defaults.Count == 0) _defaults.Add(CultureInfo.CurrentCulture);
+        // Build into fresh collections so Build() is idempotent (callable more than once
+        // without accumulating rules/cultures on the builder).
+        var defaults = _defaults.Count == 0
+            ? new List<CultureInfo> { CultureInfo.CurrentCulture }
+            : new List<CultureInfo>(_defaults);
+
+        var buckets = _culture.ToDictionary(
+            kv => kv.Key, kv => new List<IPiiRule>(kv.Value),
+            StringComparer.OrdinalIgnoreCase);
 
         // Bind "all configured cultures" rules to every configured culture's bucket.
         if (_allCultureRules.Count > 0)
-            foreach (var ci in _defaults)
-                GetBucket(ci.Name).AddRange(_allCultureRules);
+            foreach (var ci in defaults)
+            {
+                if (!buckets.TryGetValue(ci.Name, out var list))
+                    buckets[ci.Name] = list = new List<IPiiRule>();
+                list.AddRange(_allCultureRules);
+            }
 
-        var frozen = _culture.ToDictionary(
+        var frozen = buckets.ToDictionary(
             kv => kv.Key, kv => (IReadOnlyList<IPiiRule>)kv.Value,
             StringComparer.OrdinalIgnoreCase);
-        return new PiiDetector(_invariant, frozen, _defaults, _overlap);
+        return new PiiDetector(_invariant, frozen, defaults, _overlap);
     }
 
     private List<IPiiRule> GetBucket(string culture)

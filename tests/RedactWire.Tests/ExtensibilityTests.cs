@@ -120,6 +120,35 @@ public class ExtensibilityTests
     }
 
     [Fact]
+    public void Build_is_idempotent()
+    {
+        var builder = PiiDetectorBuilder.CreateEmpty()
+            .AddCulture(Ci("en-US"))
+            .AddRule(new TokenRule(PiiType.Email));
+
+        builder.Build();                 // first build
+        var d = builder.Build();         // second build must not double-bind the rule
+
+        var matches = d.Detect("TOKEN", Ci("en-US")).Cultures.Single().Matches;
+        Assert.Single(matches);
+    }
+
+    [Fact]
+    public void Redaction_merges_partial_overlaps_no_leak()
+    {
+        // Invariant rule matches [0,5); a culture rule matches [2,8). Their union is the
+        // whole string; redaction must mask all of it, not leave the [0,2) prefix exposed.
+        var d = PiiDetectorBuilder.CreateEmpty()
+            .AddInvariantRule(new RegexRule("Inv", PiiType.Email, "(?<v>X{5})", baseConfidence: 0.9))
+            .AddRule(Ci("en-US"),
+                new RegexRule("Cul", PiiType.Phone, "(?<v>X{3}Y{3})", baseConfidence: 0.9))
+            .Build();
+
+        var redacted = d.Detect("XXXXXYYY", Ci("en-US")).Redact();
+        Assert.Equal("********", redacted);   // 8 chars, fully masked
+    }
+
+    [Fact]
     public void AddRule_all_cultures_is_order_independent()
     {
         // AddRule called before AddCulture still binds (deferred to Build).

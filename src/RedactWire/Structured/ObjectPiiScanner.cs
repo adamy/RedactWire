@@ -48,46 +48,55 @@ public static class ObjectPiiScanner
         var type = obj.GetType();
         if (IsScalar(type)) return;
 
-        // Reference types only: guard against cycles / shared references.
-        if (!type.IsValueType && !visited.Add(obj)) return;
-
-        if (obj is IDictionary dict)
+        // Track only the current ancestor chain (not all-time visited): a true cycle
+        // (obj already on the path) is skipped, but a shared object reached by two
+        // different paths is still scanned at each path.
+        bool tracked = !type.IsValueType;
+        if (tracked && !visited.Add(obj)) return;   // already an ancestor → cycle
+        try
         {
-            foreach (DictionaryEntry e in dict)
-                Walk(detector, e.Value, $"{path}[{e.Key}]", depth + 1, cultures, visited, sink);
-            return;
-        }
-
-        if (obj is IEnumerable seq)   // string already handled above
-        {
-            int i = 0;
-            foreach (var item in seq)
-                Walk(detector, item, $"{path}[{i++}]", depth + 1, cultures, visited, sink);
-            return;
-        }
-
-        // Don't reflect into framework types (CultureInfo, Type, etc.).
-        if (IsFrameworkType(type)) return;
-
-        foreach (var member in MembersOf(type))
-        {
-            object? value;
-            try
+            if (obj is IDictionary dict)
             {
-                value = member switch
+                foreach (DictionaryEntry e in dict)
+                    Walk(detector, e.Value, $"{path}[\"{e.Key}\"]", depth + 1, cultures, visited, sink);
+                return;
+            }
+
+            if (obj is IEnumerable seq)   // string already handled above
+            {
+                int i = 0;
+                foreach (var item in seq)
+                    Walk(detector, item, $"{path}[{i++}]", depth + 1, cultures, visited, sink);
+                return;
+            }
+
+            // Don't reflect into framework types (CultureInfo, Type, etc.).
+            if (IsFrameworkType(type)) return;
+
+            foreach (var member in MembersOf(type))
+            {
+                object? value;
+                try
                 {
-                    PropertyInfo p => p.GetValue(obj),
-                    FieldInfo f => f.GetValue(obj),
-                    _ => null,
-                };
-            }
-            catch
-            {
-                continue;   // getter threw — skip this member
-            }
+                    value = member switch
+                    {
+                        PropertyInfo p => p.GetValue(obj),
+                        FieldInfo f => f.GetValue(obj),
+                        _ => null,
+                    };
+                }
+                catch
+                {
+                    continue;   // getter threw — skip this member
+                }
 
-            var childPath = path.Length == 0 ? member.Name : $"{path}.{member.Name}";
-            Walk(detector, value, childPath, depth + 1, cultures, visited, sink);
+                var childPath = path.Length == 0 ? member.Name : $"{path}.{member.Name}";
+                Walk(detector, value, childPath, depth + 1, cultures, visited, sink);
+            }
+        }
+        finally
+        {
+            if (tracked) visited.Remove(obj);
         }
     }
 

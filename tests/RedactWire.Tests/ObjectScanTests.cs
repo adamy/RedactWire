@@ -53,6 +53,22 @@ public class ObjectScanTests
         Assert.Contains(hits, h => h.Path == "Email");
     }
 
+    private sealed class Pair
+    {
+        public Person? A { get; set; }
+        public Person? B { get; set; }
+    }
+
+    [Fact]
+    public void Shared_non_cyclic_reference_is_scanned_at_each_path()
+    {
+        var shared = new Person { Email = "a@b.com" };
+        var pair = new Pair { A = shared, B = shared };   // same object, two paths
+        var hits = Detector.DetectObject(pair);
+        Assert.Contains(hits, h => h.Path == "A.Email");
+        Assert.Contains(hits, h => h.Path == "B.Email");  // not pruned by a global visited set
+    }
+
     [Fact]
     public void Null_members_are_skipped()
     {
@@ -72,7 +88,7 @@ public class ObjectScanTests
     {
         var bag = new Bag { Map = { ["home"] = "a@b.com" } };
         var h = Assert.Single(Detector.DetectObject(bag));
-        Assert.Equal("Map[home]", h.Path);
+        Assert.Equal("Map[\"home\"]", h.Path);
         Assert.Equal(PiiType.Email, h.Match.Type);
     }
 

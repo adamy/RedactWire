@@ -34,7 +34,7 @@ public static class JsonPiiScanner
         {
             case JsonValueKind.Object:
                 foreach (var prop in el.EnumerateObject())
-                    Walk(detector, prop.Value, $"{path}.{prop.Name}", cultures, sink);
+                    Walk(detector, prop.Value, $"{path}{Step(prop.Name)}", cultures, sink);
                 break;
 
             case JsonValueKind.Array:
@@ -52,5 +52,20 @@ public static class JsonPiiScanner
 
             // Numbers / booleans / null are not scanned (see class summary).
         }
+    }
+
+    // Dotted step for a simple identifier, bracket-quoted otherwise, so a property name
+    // containing '.', '[', etc. yields an unambiguous JSONPath ($['a.b']).
+    private static string Step(string name)
+    {
+        bool simple = name.Length > 0;
+        for (int i = 0; simple && i < name.Length; i++)
+        {
+            char c = name[i];
+            bool ok = c == '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')
+                      || (i > 0 && c >= '0' && c <= '9');
+            if (!ok) simple = false;
+        }
+        return simple ? $".{name}" : $"['{name.Replace("'", "\\'")}']";
     }
 }

@@ -57,8 +57,8 @@ public sealed class RegexRule : IPiiRule
         double baseConfidence = 0.6,
         Func<string, (bool, double)>? validate = null,
         PiiSeverity? severity = null,
-        string? subtype = null,
-        RegexOptions options = RegexOptions.Compiled | RegexOptions.CultureInvariant)
+        RegexOptions options = RegexOptions.Compiled | RegexOptions.CultureInvariant,
+        string? subtype = null)
     {
         Name = name;
         Type = type;

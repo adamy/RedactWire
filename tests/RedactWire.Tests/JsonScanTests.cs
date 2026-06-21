@@ -68,6 +68,13 @@ public class JsonScanTests
     }
 
     [Fact]
+    public void Property_name_with_dot_is_bracket_quoted()
+    {
+        var h = Assert.Single(Detector.DetectJson("""{"a.b":"x@y.com"}"""));
+        Assert.Equal("$['a.b']", h.Path);
+    }
+
+    [Fact]
     public void Invalid_json_throws()
     {
         Assert.ThrowsAny<JsonException>(() => Detector.DetectJson("{ not json"));

@@ -18,7 +18,10 @@ public sealed record PiiResult(
     public bool HasPii =>
         Invariant.Matches.Count > 0 || Cultures.Any(c => c.Matches.Count > 0);
 
-    /// <summary>Flat view across everything, if the caller just wants all hits.</summary>
+    /// <summary>Flat view across everything, if the caller just wants all hits.
+    /// Overlap resolution runs per group (invariant and each culture independently), so
+    /// this flat view may contain spans that overlap across groups. Redaction merges them;
+    /// callers that need a de-overlapped set should resolve themselves.</summary>
     public IEnumerable<PiiMatch> AllMatches =>
         Invariant.Matches.Concat(Cultures.SelectMany(c => c.Matches));
 }
