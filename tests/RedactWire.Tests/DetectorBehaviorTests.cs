@@ -18,6 +18,12 @@ public class DetectorBehaviorTests
     }
 
     [Fact]
+    public void AvailableCultures_lists_builtin_packs()
+    {
+        Assert.Contains("en-US", PiiDetectorBuilder.AvailableCultures);
+    }
+
+    [Fact]
     public void Unsupported_culture_does_not_pass()
     {
         var detector = PiiDetectorBuilder.CreateDefault().Build();

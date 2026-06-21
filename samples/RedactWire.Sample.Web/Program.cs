@@ -2,14 +2,20 @@
 // Copyright 2026 Adam Yang, Object IT Limited, Auckland, NZ
 
 using System.Globalization;
+using RedactWire;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages();
 
-// Pipeline bootstrap: register a shared PiiDetector via DI (invariant rules + en-US).
-// This is the "with bootstrap" path; the static Redactor facade needs none of this.
-builder.Services.AddRedactWire(b => b.AddCulture(new CultureInfo("en-US")));
+// Pipeline bootstrap: register a shared PiiDetector via DI (invariant rules + every
+// built-in culture pack). This is the "with bootstrap" path; the static Redactor facade
+// needs none of this.
+builder.Services.AddRedactWire(b =>
+{
+    foreach (var culture in PiiDetectorBuilder.AvailableCultures)
+        b.AddCulture(new CultureInfo(culture));
+});
 
 var app = builder.Build();
 

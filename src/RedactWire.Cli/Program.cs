@@ -35,7 +35,7 @@ var (textArg, redact, cultures, help) = Parse(args);
 
 if (help)
 {
-    Console.WriteLine("""
+    Console.WriteLine($"""
         RedactWire — PII detector
 
         Usage:
@@ -44,9 +44,11 @@ if (help)
 
         Options:
           -t, --text <s>        text to scan (else read stdin)
-          -c, --culture <code>  culture pack, repeatable (default: en-US)
+          -c, --culture <code>  culture pack, repeatable (default: all built-in packs)
           -r, --redact          print redacted text instead of a match report
           -h, --help            this help
+
+        Built-in culture packs: {string.Join(", ", PiiDetectorBuilder.AvailableCultures)}
 
         Exit: 1 if PII found, 0 if clean.
         """);
@@ -61,8 +63,10 @@ if (string.IsNullOrEmpty(input))
 }
 
 var builder = PiiDetectorBuilder.CreateDefault();
-if (cultures.Count == 0) builder.AddCulture(new CultureInfo("en-US"));
-else foreach (var c in cultures) builder.AddCulture(c);
+if (cultures.Count == 0)
+    foreach (var c in PiiDetectorBuilder.AvailableCultures) builder.AddCulture(new CultureInfo(c));
+else
+    foreach (var c in cultures) builder.AddCulture(c);
 var result = builder.Build().Detect(input);
 
 if (redact)

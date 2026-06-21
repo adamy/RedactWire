@@ -26,8 +26,8 @@ public class IndexModel : PageModel
     public PiiResult? Result { get; private set; }
     public string? Redacted { get; private set; }
 
-    // Cultures the user can pick. "fr-FR" has no pack — demonstrates the Supported flag.
-    public static readonly string[] Cultures = { "en-US", "fr-FR" };
+    // Built-in culture packs to choose from (grows automatically as packs are added).
+    public static IReadOnlyList<string> Cultures => PiiDetectorBuilder.AvailableCultures;
 
     public void OnGet()
     {

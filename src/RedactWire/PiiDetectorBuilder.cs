@@ -20,6 +20,12 @@ public sealed class PiiDetectorBuilder
     private readonly List<CultureInfo> _defaults = new();
     private OverlapStrategy _overlap = OverlapStrategy.KeepHighestConfidence;
 
+    /// <summary>Culture codes that ship with a built-in rule pack (e.g. "en-US").
+    /// Pass any of these to <see cref="AddCulture"/>. Grows as packs are added — use this
+    /// instead of hard-coding the list in UIs/CLIs.</summary>
+    public static IReadOnlyList<string> AvailableCultures { get; } =
+        DefaultRules.ByCulture.Keys.OrderBy(k => k, StringComparer.OrdinalIgnoreCase).ToArray();
+
     /// <summary>Start with the built-in invariant rules (email, credit card, IP, IBAN).</summary>
     public static PiiDetectorBuilder CreateDefault()
     {
