@@ -428,6 +428,79 @@ internal static class Checksums
         return c == check;
     }
 
+    /// <summary>Sweden personnummer: 10 or 12 digits, Luhn over the 10-digit form plus a
+    /// birth-date sanity check. VERIFY: algorithm.</summary>
+    public static bool SwedenPersonnummer(string raw)
+    {
+        var d = Digits(raw);
+        if (d.Length == 12) d = d.Substring(2);
+        if (d.Length != 10) return false;
+        int mm = (d[2] - '0') * 10 + (d[3] - '0');
+        int dd = (d[4] - '0') * 10 + (d[5] - '0');
+        if (mm < 1 || mm > 12 || dd < 1 || dd > 31) return false;
+        return Luhn(d);
+    }
+
+    /// <summary>Norway fødselsnummer: 11 digits, two weighted mod-11 control digits.
+    /// VERIFY: algorithm.</summary>
+    public static bool NorwayFnr(string raw)
+    {
+        var d = Digits(raw);
+        if (d.Length != 11) return false;
+        int Ctrl(int[] w, int len)
+        {
+            int sum = 0;
+            for (int i = 0; i < len; i++) sum += (d[i] - '0') * w[i];
+            int k = 11 - sum % 11;
+            return k == 11 ? 0 : k;   // 10 stays 10 → caller rejects
+        }
+        int k1 = Ctrl(new[] { 3, 7, 6, 1, 8, 9, 4, 5, 2 }, 9);
+        if (k1 == 10 || k1 != d[9] - '0') return false;
+        int k2 = Ctrl(new[] { 5, 4, 3, 2, 7, 6, 5, 4, 3, 2 }, 10);
+        return k2 != 10 && k2 == d[10] - '0';
+    }
+
+    /// <summary>Denmark CPR: 10 digits (DDMMYY-SSSS). The mod-11 check has documented
+    /// exceptions, so only the embedded birth date is sanity-checked. VERIFY: structure.</summary>
+    public static bool DenmarkCpr(string raw)
+    {
+        var d = Digits(raw);
+        if (d.Length != 10) return false;
+        int dd = (d[0] - '0') * 10 + (d[1] - '0');
+        int mm = (d[2] - '0') * 10 + (d[3] - '0');
+        return dd >= 1 && dd <= 31 && mm >= 1 && mm <= 12;
+    }
+
+    /// <summary>Finland HETU: DDMMYY + century sign + 3-digit individual + control char
+    /// (number mod 31 indexed into a fixed alphabet). VERIFY: algorithm.</summary>
+    public static bool FinlandHetu(string raw)
+    {
+        var s = raw.Trim().ToUpperInvariant();
+        if (s.Length != 11) return false;
+        const string alphabet = "0123456789ABCDEFHJKLMNPRSTUVWXY";
+        for (int i = 0; i < 6; i++) if (s[i] < '0' || s[i] > '9') return false;
+        for (int i = 7; i < 10; i++) if (s[i] < '0' || s[i] > '9') return false;
+
+        int dd = (s[0] - '0') * 10 + (s[1] - '0');
+        int mm = (s[2] - '0') * 10 + (s[3] - '0');
+        if (dd < 1 || dd > 31 || mm < 1 || mm > 12) return false;
+
+        long number = long.Parse(s.Substring(0, 6) + s.Substring(7, 3));
+        return alphabet[(int)(number % 31)] == s[10];
+    }
+
+    /// <summary>South Africa ID: 13 digits, Luhn plus an embedded birth date (YYMMDD).
+    /// VERIFY: algorithm.</summary>
+    public static bool SouthAfricaId(string raw)
+    {
+        var d = Digits(raw);
+        if (d.Length != 13) return false;
+        int mm = (d[2] - '0') * 10 + (d[3] - '0');
+        int dd = (d[4] - '0') * 10 + (d[5] - '0');
+        if (mm < 1 || mm > 12 || dd < 1 || dd > 31) return false;
+        return Luhn(d);
+    }
+
     /// <summary>Indonesia NIK (KTP): 16 digits with an embedded birth date at positions
     /// 6..11 = DDMMYY (DD is +40 for females). No check digit, so we sanity-check the date.
     /// VERIFY: NIK structure.</summary>
