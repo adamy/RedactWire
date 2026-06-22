@@ -182,6 +182,24 @@ internal static class Checksums
         return check == d[11] - '0';
     }
 
+    /// <summary>Mexico CURP: 18 chars, weighted mod-10 check digit (last).
+    /// VERIFY: CURP check-digit algorithm.</summary>
+    public static bool MexicoCurp(string id)
+    {
+        const string dict = "0123456789ABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
+        if (id.Length != 18) return false;
+        int sum = 0;
+        for (int i = 0; i < 17; i++)
+        {
+            int v = dict.IndexOf(char.ToUpperInvariant(id[i]));
+            if (v < 0) return false;
+            sum += v * (18 - i);
+        }
+        if (id[17] < '0' || id[17] > '9') return false;
+        int check = (10 - sum % 10) % 10;
+        return check == id[17] - '0';
+    }
+
     /// <summary>Indonesia NIK (KTP): 16 digits with an embedded birth date at positions
     /// 6..11 = DDMMYY (DD is +40 for females). No check digit, so we sanity-check the date.
     /// VERIFY: NIK structure.</summary>

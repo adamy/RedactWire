@@ -4,6 +4,7 @@
 using RedactWire.Rules.Localized.EnIn;
 using RedactWire.Rules.Localized.EnNg;
 using RedactWire.Rules.Localized.EnUs;
+using RedactWire.Rules.Localized.EsMx;
 using RedactWire.Rules.Localized.IdId;
 using RedactWire.Rules.Localized.JaJp;
 using RedactWire.Rules.Localized.PtBr;
@@ -52,5 +53,6 @@ internal static class DefaultRules
             ["ru-RU"] = RuRuRules.Rules,
             ["ja-JP"] = JaJpRules.Rules,
             ["en-NG"] = EnNgRules.Rules,
+            ["es-MX"] = EsMxRules.Rules,
         };
 }
