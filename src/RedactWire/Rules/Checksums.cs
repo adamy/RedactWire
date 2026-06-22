@@ -29,6 +29,47 @@ internal static class Checksums
         return sum % 10 == 0;
     }
 
+    // Verhoeff tables (dihedral group D5). Used by India Aadhaar, among others.
+    private static readonly int[][] VD =
+    {
+        new[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 },
+        new[] { 1, 2, 3, 4, 0, 6, 7, 8, 9, 5 },
+        new[] { 2, 3, 4, 0, 1, 7, 8, 9, 5, 6 },
+        new[] { 3, 4, 0, 1, 2, 8, 9, 5, 6, 7 },
+        new[] { 4, 0, 1, 2, 3, 9, 5, 6, 7, 8 },
+        new[] { 5, 9, 8, 7, 6, 0, 4, 3, 2, 1 },
+        new[] { 6, 5, 9, 8, 7, 1, 0, 4, 3, 2 },
+        new[] { 7, 6, 5, 9, 8, 2, 1, 0, 4, 3 },
+        new[] { 8, 7, 6, 5, 9, 3, 2, 1, 0, 4 },
+        new[] { 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 },
+    };
+    private static readonly int[][] VP =
+    {
+        new[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 },
+        new[] { 1, 5, 7, 6, 2, 8, 3, 0, 9, 4 },
+        new[] { 5, 8, 0, 3, 7, 9, 6, 1, 4, 2 },
+        new[] { 8, 9, 1, 6, 0, 4, 3, 5, 2, 7 },
+        new[] { 9, 4, 5, 3, 1, 2, 6, 8, 7, 0 },
+        new[] { 4, 2, 8, 6, 5, 7, 3, 9, 0, 1 },
+        new[] { 2, 7, 9, 3, 8, 0, 6, 4, 1, 5 },
+        new[] { 7, 0, 4, 6, 9, 1, 3, 2, 5, 8 },
+    };
+
+    /// <summary>Verhoeff checksum: valid when the running product over all digits
+    /// (rightmost first, including the trailing check digit) collapses to 0.
+    /// VERIFY: used by India Aadhaar (12 digits).</summary>
+    public static bool Verhoeff(string digits)
+    {
+        int c = 0;
+        for (int i = 0; i < digits.Length; i++)
+        {
+            char ch = digits[digits.Length - 1 - i];
+            if (ch < '0' || ch > '9') return false;
+            c = VD[c][VP[i % 8][ch - '0']];
+        }
+        return c == 0;
+    }
+
     /// <summary>China Resident Identity Card (GB 11643-1999): 18 chars, weighted mod-11
     /// check digit (last char may be 'X') plus an embedded birth date sanity check.
     /// VERIFY: algorithm per GB 11643-1999.</summary>
