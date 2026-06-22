@@ -4,6 +4,7 @@
 using RedactWire.Rules.Localized.EnIn;
 using RedactWire.Rules.Localized.EnUs;
 using RedactWire.Rules.Localized.IdId;
+using RedactWire.Rules.Localized.PtBr;
 using RedactWire.Rules.Localized.ZhCn;
 
 namespace RedactWire.Rules;
@@ -44,5 +45,6 @@ internal static class DefaultRules
             ["zh-CN"] = ZhCnRules.Rules,
             ["en-IN"] = EnInRules.Rules,
             ["id-ID"] = IdIdRules.Rules,
+            ["pt-BR"] = PtBrRules.Rules,
         };
 }

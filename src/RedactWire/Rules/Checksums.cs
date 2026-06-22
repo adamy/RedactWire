@@ -95,6 +95,42 @@ internal static class Checksums
                && dob <= DateTime.Today && dob.Year >= 1900;
     }
 
+    /// <summary>Brazil CPF: 11 digits, two mod-11 check digits. All-equal digit strings
+    /// (e.g. 00000000000) are rejected. Accepts formatted input. VERIFY: CPF algorithm.</summary>
+    public static bool Cpf(string raw)
+    {
+        var d = Digits(raw);
+        if (d.Length != 11 || d.All(c => c == d[0])) return false;
+
+        int Check(int len)
+        {
+            int sum = 0;
+            for (int i = 0; i < len; i++) sum += (d[i] - '0') * (len + 1 - i);
+            int r = sum % 11;
+            return r < 2 ? 0 : 11 - r;
+        }
+        return Check(9) == d[9] - '0' && Check(10) == d[10] - '0';
+    }
+
+    /// <summary>Brazil CNPJ (business): 14 digits, two mod-11 check digits with the
+    /// standard weight sequences. VERIFY: CNPJ algorithm.</summary>
+    public static bool Cnpj(string raw)
+    {
+        var d = Digits(raw);
+        if (d.Length != 14 || d.All(c => c == d[0])) return false;
+
+        int Check(int len, int[] w)
+        {
+            int sum = 0;
+            for (int i = 0; i < len; i++) sum += (d[i] - '0') * w[i];
+            int r = sum % 11;
+            return r < 2 ? 0 : 11 - r;
+        }
+        int[] w1 = { 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
+        int[] w2 = { 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
+        return Check(12, w1) == d[12] - '0' && Check(13, w2) == d[13] - '0';
+    }
+
     /// <summary>Indonesia NIK (KTP): 16 digits with an embedded birth date at positions
     /// 6..11 = DDMMYY (DD is +40 for females). No check digit, so we sanity-check the date.
     /// VERIFY: NIK structure.</summary>
