@@ -217,6 +217,50 @@ internal static class Checksums
         return check == d[10] - '0';
     }
 
+    /// <summary>Turkey TC Kimlik No: 11 digits. d10 and d11 are check digits.
+    /// VERIFY: TC Kimlik algorithm.</summary>
+    public static bool TurkeyId(string raw)
+    {
+        var d = Digits(raw);
+        if (d.Length != 11 || d[0] == '0') return false;
+        int[] n = new int[11];
+        for (int i = 0; i < 11; i++) n[i] = d[i] - '0';
+        int odd = n[0] + n[2] + n[4] + n[6] + n[8];
+        int even = n[1] + n[3] + n[5] + n[7];
+        if ((odd * 7 - even) % 10 != n[9]) return false;
+        int sum = 0;
+        for (int i = 0; i < 10; i++) sum += n[i];
+        return sum % 10 == n[10];
+    }
+
+    /// <summary>France NIR (numéro de sécurité sociale): 15 digits, key = 97 - (N mod 97)
+    /// where N is the first 13 digits. Corsica (2A/2B) letters are not handled here.
+    /// VERIFY: NIR key algorithm.</summary>
+    public static bool FranceNir(string raw)
+    {
+        var d = Digits(raw);
+        if (d.Length != 15) return false;
+        long n = 0;
+        for (int i = 0; i < 13; i++) n = n * 10 + (d[i] - '0');
+        int key = (int)(97 - n % 97);
+        int given = (d[13] - '0') * 10 + (d[14] - '0');
+        return key == given;
+    }
+
+    /// <summary>UK NHS number: 10 digits, weighted mod-11 check digit (last).
+    /// A computed check of 10 is invalid. VERIFY: NHS check-digit algorithm.</summary>
+    public static bool NhsNumber(string raw)
+    {
+        var d = Digits(raw);
+        if (d.Length != 10) return false;
+        int sum = 0;
+        for (int i = 0; i < 9; i++) sum += (d[i] - '0') * (10 - i);
+        int check = 11 - sum % 11;
+        if (check == 11) check = 0;
+        if (check == 10) return false;
+        return check == d[9] - '0';
+    }
+
     /// <summary>Indonesia NIK (KTP): 16 digits with an embedded birth date at positions
     /// 6..11 = DDMMYY (DD is +40 for females). No check digit, so we sanity-check the date.
     /// VERIFY: NIK structure.</summary>
