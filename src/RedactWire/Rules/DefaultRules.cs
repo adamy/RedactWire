@@ -2,6 +2,7 @@
 // Copyright 2026 Adam Yang, Object IT Limited, Auckland, NZ
 
 using RedactWire.Rules.Localized.EnIn;
+using RedactWire.Rules.Localized.EnNg;
 using RedactWire.Rules.Localized.EnUs;
 using RedactWire.Rules.Localized.IdId;
 using RedactWire.Rules.Localized.JaJp;
@@ -50,5 +51,6 @@ internal static class DefaultRules
             ["pt-BR"] = PtBrRules.Rules,
             ["ru-RU"] = RuRuRules.Rules,
             ["ja-JP"] = JaJpRules.Rules,
+            ["en-NG"] = EnNgRules.Rules,
         };
 }
