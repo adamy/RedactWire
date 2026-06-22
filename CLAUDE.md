@@ -54,6 +54,10 @@
   use `PiiType.Custom` + `RuleHit.Subtype` (the name); it flows to `PiiMatch.Subtype` and
   redaction labels (`[Subtype ?? Type]`).
 - Overlap resolution is severity-first, then the chosen `OverlapStrategy`.
+- `PiiDetector.Validate(value, [culture,] type, subtype?)` reuses the rules/checksums to
+  full-string-validate a value, returning `ValidationResult` (Valid/Invalid/Unsupported —
+  Unsupported = no rule of that type for the culture(s)). No-culture overload uses the
+  detector's configured cultures.
 
 ## Testing
 - Every rule needs a positive, negative, and boundary test (`tests/RedactWire.Tests`).

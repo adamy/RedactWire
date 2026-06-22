@@ -36,6 +36,15 @@ public static class Redactor
         params CultureInfo[] cultures) =>
         Default.Detect(text, cultures).Redact(options);
 
+    /// <summary>Validate that a string is, in full, a valid PII item of the given type
+    /// (using the default detector's cultures: invariant + en-US plus any others built in).</summary>
+    public static ValidationResult Validate(string value, PiiType type, string? subtype = null) =>
+        Default.Validate(value, type, subtype);
+
+    /// <summary>Validate against one explicit culture.</summary>
+    public static ValidationResult Validate(string value, CultureInfo culture, PiiType type, string? subtype = null) =>
+        Default.Validate(value, culture, type, subtype);
+
     /// <summary>Scan a JSON string; matches are located by JSONPath.</summary>
     public static IReadOnlyList<StructuredPiiMatch> DetectJson(string json, params CultureInfo[] cultures) =>
         Default.DetectJson(json, cultures);

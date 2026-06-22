@@ -102,6 +102,26 @@ r.Redact(new RedactionOptions { Mode = RedactionMode.Label }); // "SSN [SocialSe
 r.Redact(new RedactionOptions { Custom = m => $"<{m.Type}>" });
 ```
 
+## Validation
+
+Check whether a string is, in full, a valid PII item of a given type — same rules and
+checksums as detection. Returns `Valid` / `Invalid` / `Unsupported` (the last kept
+distinct so "no rule for this type/culture" isn't mistaken for "invalid").
+
+```csharp
+Redactor.Validate("123-45-6789", PiiType.SocialSecurity);            // Valid
+Redactor.Validate("123-45-0000", PiiType.SocialSecurity);            // Invalid
+Redactor.Validate("110101199001010015",
+    new CultureInfo("zh-CN"), PiiType.NationalId);                   // Valid (GB11643)
+Redactor.Validate("x", new CultureInfo("fr-FR"), PiiType.NationalId); // Unsupported
+
+// PiiType.Custom needs a subtype:
+detector.Validate("112-233-445 95", new CultureInfo("ru-RU"), PiiType.Custom, "SNILS");
+```
+
+The no-culture overload validates against the detector's configured cultures; pass a
+`CultureInfo` to target one. Must be a full-string match (surrounding whitespace ignored).
+
 ## Structured scanning (JSON / XML / objects)
 
 Scan structured data and get each match with its location. Available on `PiiDetector`

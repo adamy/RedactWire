@@ -59,6 +59,49 @@ public sealed class PiiDetector
         return new PiiResult(text, perCulture, invariant);
     }
 
+    /// <summary>Validate that <paramref name="value"/> is, in its entirety, a valid PII
+    /// item of <paramref name="type"/> — running the same rules (and checksums) used for
+    /// detection against the detector's configured cultures. Surrounding whitespace is
+    /// ignored; the value must match a rule end-to-end (not just contain one).
+    /// <para>For <see cref="PiiType.Custom"/>, pass <paramref name="subtype"/> (e.g.
+    /// "SNILS") to require a specific custom type.</para></summary>
+    public ValidationResult Validate(string value, PiiType type, string? subtype = null) =>
+        ValidateCore(value, type, subtype, _defaultCultures);
+
+    /// <summary>As <see cref="Validate(string, PiiType, string?)"/>, but validating against
+    /// one explicit <paramref name="culture"/> instead of the detector's configured set.</summary>
+    public ValidationResult Validate(string value, CultureInfo culture, PiiType type, string? subtype = null) =>
+        ValidateCore(value, type, subtype, new[] { culture });
+
+    private ValidationResult ValidateCore(
+        string value, PiiType type, string? subtype, IReadOnlyList<CultureInfo> cultures)
+    {
+        var v = (value ?? string.Empty).Trim();
+        bool anyRule = false;
+
+        foreach (var rule in Candidates(type, cultures))
+        {
+            anyRule = true;
+            if (v.Length == 0) continue;
+            foreach (var h in rule.Find(v))
+                if (h.Start == 0 && h.Length == v.Length
+                    && (subtype is null
+                        || string.Equals(h.Subtype, subtype, StringComparison.OrdinalIgnoreCase)))
+                    return ValidationResult.Valid;
+        }
+
+        // A rule of this type exists → the value is simply Invalid; otherwise Unsupported.
+        return anyRule ? ValidationResult.Invalid : ValidationResult.Unsupported;
+    }
+
+    // Rules that could produce a match of the requested type: invariant + the culture packs.
+    private IEnumerable<IPiiRule> Candidates(PiiType type, IReadOnlyList<CultureInfo> cultures)
+    {
+        foreach (var r in _invariantRules) if (r.Type == type) yield return r;
+        foreach (var ci in cultures)
+            foreach (var r in ResolveRulesFor(ci)) if (r.Type == type) yield return r;
+    }
+
     // Run rules and stamp each raw hit with culture, rule id, and a severity fallback.
     private static IEnumerable<PiiMatch> RunRules(
         IReadOnlyList<IPiiRule> rules, string text, string culture)
