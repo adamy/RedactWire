@@ -200,6 +200,23 @@ internal static class Checksums
         return check == id[17] - '0';
     }
 
+    /// <summary>Germany tax ID (Steuerliche Identifikationsnummer): 11 digits, ISO 7064
+    /// MOD 11,10 check digit (last). VERIFY: IdNr check algorithm.</summary>
+    public static bool GermanyTaxId(string raw)
+    {
+        var d = Digits(raw);
+        if (d.Length != 11) return false;
+        int product = 10;
+        for (int i = 0; i < 10; i++)
+        {
+            int sum = (d[i] - '0' + product) % 10;
+            if (sum == 0) sum = 10;
+            product = sum * 2 % 11;
+        }
+        int check = (11 - product) % 10;
+        return check == d[10] - '0';
+    }
+
     /// <summary>Indonesia NIK (KTP): 16 digits with an embedded birth date at positions
     /// 6..11 = DDMMYY (DD is +40 for females). No check digit, so we sanity-check the date.
     /// VERIFY: NIK structure.</summary>

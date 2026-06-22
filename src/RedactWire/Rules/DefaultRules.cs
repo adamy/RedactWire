@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2026 Adam Yang, Object IT Limited, Auckland, NZ
 
+using RedactWire.Rules.Localized.DeDe;
 using RedactWire.Rules.Localized.EnIn;
 using RedactWire.Rules.Localized.EnNg;
 using RedactWire.Rules.Localized.EnUs;
@@ -54,5 +55,6 @@ internal static class DefaultRules
             ["ja-JP"] = JaJpRules.Rules,
             ["en-NG"] = EnNgRules.Rules,
             ["es-MX"] = EsMxRules.Rules,
+            ["de-DE"] = DeDeRules.Rules,
         };
 }
