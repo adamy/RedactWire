@@ -261,6 +261,86 @@ internal static class Checksums
         return check == d[9] - '0';
     }
 
+    /// <summary>Iran national ID (کد ملی): 10 digits, weighted mod-11 check digit.
+    /// VERIFY: algorithm.</summary>
+    public static bool IranId(string raw)
+    {
+        var d = Digits(raw);
+        if (d.Length != 10 || d.All(c => c == d[0])) return false;
+        int sum = 0;
+        for (int i = 0; i < 9; i++) sum += (d[i] - '0') * (10 - i);
+        int r = sum % 11;
+        int check = r < 2 ? r : 11 - r;
+        return check == d[9] - '0';
+    }
+
+    /// <summary>Thailand national ID: 13 digits, weighted mod-11 check digit.
+    /// VERIFY: algorithm.</summary>
+    public static bool ThailandId(string raw)
+    {
+        var d = Digits(raw);
+        if (d.Length != 13) return false;
+        int sum = 0;
+        for (int i = 0; i < 12; i++) sum += (d[i] - '0') * (13 - i);
+        int check = (11 - sum % 11) % 10;
+        return check == d[12] - '0';
+    }
+
+    /// <summary>South Korea RRN (주민등록번호): 13 digits, weighted mod-11 check digit plus
+    /// an embedded birth date (positions 0..5 = YYMMDD). VERIFY: algorithm.</summary>
+    public static bool KoreaRrn(string raw)
+    {
+        var d = Digits(raw);
+        if (d.Length != 13) return false;
+        int[] w = { 2, 3, 4, 5, 6, 7, 8, 9, 2, 3, 4, 5 };
+        int sum = 0;
+        for (int i = 0; i < 12; i++) sum += (d[i] - '0') * w[i];
+        int check = (11 - sum % 11) % 10;
+        if (check != d[12] - '0') return false;
+        int mm = (d[2] - '0') * 10 + (d[3] - '0');
+        int dd = (d[4] - '0') * 10 + (d[5] - '0');
+        return mm >= 1 && mm <= 12 && dd >= 1 && dd <= 31;
+    }
+
+    /// <summary>Italy Codice Fiscale: 16 chars, check character from odd/even position maps.
+    /// VERIFY: algorithm.</summary>
+    public static bool ItalyCodiceFiscale(string id)
+    {
+        if (id.Length != 16) return false;
+        int[] odd =
+        {
+            1, 0, 5, 7, 9, 13, 15, 17, 19, 21,                          // 0-9
+            1, 0, 5, 7, 9, 13, 15, 17, 19, 21, 2, 4, 18, 20, 11, 3,      // A-P
+            6, 8, 12, 14, 16, 10, 22, 25, 24, 23,                        // Q-Z
+        };
+        int sum = 0;
+        for (int i = 0; i < 15; i++)
+        {
+            char c = char.ToUpperInvariant(id[i]);
+            int idx = c >= '0' && c <= '9' ? c - '0'
+                    : c >= 'A' && c <= 'Z' ? 10 + c - 'A'
+                    : -1;
+            if (idx < 0) return false;
+            sum += i % 2 == 0 ? odd[idx] : idx < 10 ? idx : idx - 10;
+        }
+        return char.ToUpperInvariant(id[15]) == (char)('A' + sum % 26);
+    }
+
+    /// <summary>Egypt national ID: 14 digits — century (2/3) + YYMMDD + governorate +
+    /// serial + (unused) check digit. No reliable public check digit, so we sanity-check
+    /// the embedded date and governorate. VERIFY: structure.</summary>
+    public static bool EgyptId(string raw)
+    {
+        var d = Digits(raw);
+        if (d.Length != 14) return false;
+        if (d[0] != '2' && d[0] != '3') return false;
+        int mm = (d[3] - '0') * 10 + (d[4] - '0');
+        int dd = (d[5] - '0') * 10 + (d[6] - '0');
+        int gov = (d[7] - '0') * 10 + (d[8] - '0');
+        if (mm < 1 || mm > 12 || dd < 1 || dd > 31) return false;
+        return (gov >= 1 && gov <= 35) || gov == 88;   // 88 = born abroad
+    }
+
     /// <summary>Indonesia NIK (KTP): 16 digits with an embedded birth date at positions
     /// 6..11 = DDMMYY (DD is +40 for females). No check digit, so we sanity-check the date.
     /// VERIFY: NIK structure.</summary>

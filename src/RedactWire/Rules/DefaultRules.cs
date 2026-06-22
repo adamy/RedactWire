@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2026 Adam Yang, Object IT Limited, Auckland, NZ
 
+using RedactWire.Rules.Localized.ArEg;
 using RedactWire.Rules.Localized.DeDe;
 using RedactWire.Rules.Localized.EnGb;
 using RedactWire.Rules.Localized.EnIn;
@@ -9,11 +10,15 @@ using RedactWire.Rules.Localized.EnPh;
 using RedactWire.Rules.Localized.EnPk;
 using RedactWire.Rules.Localized.EnUs;
 using RedactWire.Rules.Localized.EsMx;
+using RedactWire.Rules.Localized.FaIr;
 using RedactWire.Rules.Localized.FrFr;
 using RedactWire.Rules.Localized.IdId;
+using RedactWire.Rules.Localized.ItIt;
 using RedactWire.Rules.Localized.JaJp;
+using RedactWire.Rules.Localized.KoKr;
 using RedactWire.Rules.Localized.PtBr;
 using RedactWire.Rules.Localized.RuRu;
+using RedactWire.Rules.Localized.ThTh;
 using RedactWire.Rules.Localized.TrTr;
 using RedactWire.Rules.Localized.ViVn;
 using RedactWire.Rules.Localized.ZhCn;
@@ -68,5 +73,10 @@ internal static class DefaultRules
             ["en-GB"] = EnGbRules.Rules,
             ["tr-TR"] = TrTrRules.Rules,
             ["fr-FR"] = FrFrRules.Rules,
+            ["ar-EG"] = ArEgRules.Rules,
+            ["fa-IR"] = FaIrRules.Rules,
+            ["th-TH"] = ThThRules.Rules,
+            ["ko-KR"] = KoKrRules.Rules,
+            ["it-IT"] = ItItRules.Rules,
         };
 }
