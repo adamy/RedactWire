@@ -131,6 +131,39 @@ internal static class Checksums
         return Check(12, w1) == d[12] - '0' && Check(13, w2) == d[13] - '0';
     }
 
+    /// <summary>Russia INN: 10 digits (legal entity) or 12 digits (individual), with
+    /// mod-11 check digit(s). VERIFY: INN algorithm.</summary>
+    public static bool RussiaInn(string raw)
+    {
+        var d = Digits(raw);
+        int Check(int[] coef)
+        {
+            int sum = 0;
+            for (int i = 0; i < coef.Length; i++) sum += (d[i] - '0') * coef[i];
+            return sum % 11 % 10;
+        }
+        if (d.Length == 10)
+            return Check(new[] { 2, 4, 10, 3, 5, 9, 4, 6, 8 }) == d[9] - '0';
+        if (d.Length == 12)
+            return Check(new[] { 7, 2, 4, 10, 3, 5, 9, 4, 6, 8 }) == d[10] - '0'
+                && Check(new[] { 3, 7, 2, 4, 10, 3, 5, 9, 4, 6, 8 }) == d[11] - '0';
+        return false;
+    }
+
+    /// <summary>Russia SNILS: 11 digits, weighted control number over the first 9.
+    /// VERIFY: SNILS algorithm.</summary>
+    public static bool RussiaSnils(string raw)
+    {
+        var d = Digits(raw);
+        if (d.Length != 11) return false;
+        int sum = 0;
+        for (int i = 0; i < 9; i++) sum += (d[i] - '0') * (9 - i);
+        int control = sum % 101;
+        if (control == 100) control = 0;
+        int given = (d[9] - '0') * 10 + (d[10] - '0');
+        return control == given;
+    }
+
     /// <summary>Indonesia NIK (KTP): 16 digits with an embedded birth date at positions
     /// 6..11 = DDMMYY (DD is +40 for females). No check digit, so we sanity-check the date.
     /// VERIFY: NIK structure.</summary>
