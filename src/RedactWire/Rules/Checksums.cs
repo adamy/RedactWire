@@ -164,6 +164,24 @@ internal static class Checksums
         return control == given;
     }
 
+    /// <summary>Japan My Number (個人番号): 12 digits, weighted mod-11 check digit (last).
+    /// VERIFY: My Number check-digit algorithm.</summary>
+    public static bool JapanMyNumber(string raw)
+    {
+        var d = Digits(raw);
+        if (d.Length != 12) return false;
+        int sum = 0;
+        for (int n = 1; n <= 11; n++)
+        {
+            int p = d[11 - n] - '0';
+            int q = n <= 6 ? n + 1 : n - 5;
+            sum += p * q;
+        }
+        int rem = sum % 11;
+        int check = rem <= 1 ? 0 : 11 - rem;
+        return check == d[11] - '0';
+    }
+
     /// <summary>Indonesia NIK (KTP): 16 digits with an embedded birth date at positions
     /// 6..11 = DDMMYY (DD is +40 for females). No check digit, so we sanity-check the date.
     /// VERIFY: NIK structure.</summary>
