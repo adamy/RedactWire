@@ -15,10 +15,11 @@ internal static class Checksums
     /// <summary>Keep only ASCII digits.</summary>
     public static string Digits(string s) => new string(s.Where(char.IsDigit).ToArray());
 
-    /// <summary>Luhn algorithm for credit-card validation (13–19 digits).</summary>
+    /// <summary>Luhn algorithm (length-agnostic): callers anchor the length via their
+    /// regex. Used by credit cards (13–19 digits) and Canada SIN (9 digits).</summary>
     public static bool Luhn(string digits)
     {
-        if (digits.Length < 13 || digits.Length > 19) return false;
+        if (digits.Length == 0) return false;
         int sum = 0; bool dbl = false;
         for (int i = digits.Length - 1; i >= 0; i--)
         {
@@ -360,6 +361,71 @@ internal static class Checksums
         else return false;
 
         return long.TryParse(digits, out var n) && letters[(int)(n % 23)] == last;
+    }
+
+    /// <summary>Australia TFN: 9 digits, weighted sum divisible by 11. VERIFY: algorithm.</summary>
+    public static bool AustraliaTfn(string raw)
+    {
+        var d = Digits(raw);
+        if (d.Length != 9) return false;
+        int[] w = { 1, 4, 3, 7, 5, 8, 6, 9, 10 };
+        int sum = 0;
+        for (int i = 0; i < 9; i++) sum += (d[i] - '0') * w[i];
+        return sum % 11 == 0;
+    }
+
+    /// <summary>Netherlands BSN: 9 digits, "11-proef" (weights 9..2 then -1, divisible by 11).
+    /// VERIFY: algorithm.</summary>
+    public static bool NetherlandsBsn(string raw)
+    {
+        var d = Digits(raw);
+        if (d.Length != 9) return false;
+        int[] w = { 9, 8, 7, 6, 5, 4, 3, 2, -1 };
+        int sum = 0;
+        for (int i = 0; i < 9; i++) sum += (d[i] - '0') * w[i];
+        return sum % 11 == 0;
+    }
+
+    /// <summary>Poland PESEL: 11 digits, weighted mod-10 check digit + an embedded birth
+    /// date (the month encodes the century). VERIFY: algorithm.</summary>
+    public static bool PolandPesel(string raw)
+    {
+        var d = Digits(raw);
+        if (d.Length != 11) return false;
+        int[] w = { 1, 3, 7, 9, 1, 3, 7, 9, 1, 3 };
+        int sum = 0;
+        for (int i = 0; i < 10; i++) sum += (d[i] - '0') * w[i];
+        if ((10 - sum % 10) % 10 != d[10] - '0') return false;
+
+        int mm = (d[2] - '0') * 10 + (d[3] - '0');
+        int dd = (d[4] - '0') * 10 + (d[5] - '0');
+        bool monthOk = (mm >= 1 && mm <= 12) || (mm >= 21 && mm <= 32)
+                    || (mm >= 41 && mm <= 52) || (mm >= 61 && mm <= 72) || (mm >= 81 && mm <= 92);
+        return monthOk && dd >= 1 && dd <= 31;
+    }
+
+    /// <summary>New Zealand IRD number: 8 or 9 digits, IR's weighted algorithm with a
+    /// secondary weighting fallback. VERIFY: IRD algorithm.</summary>
+    public static bool NzIrd(string raw)
+    {
+        var s = Digits(raw);
+        if (s.Length == 8) s = "0" + s;
+        if (s.Length != 9) return false;
+        if (!long.TryParse(s, out var n) || n < 10_000_000 || n > 150_000_000) return false;
+
+        int[] w1 = { 3, 2, 7, 6, 5, 4, 3, 2 };
+        int[] w2 = { 7, 4, 3, 2, 5, 2, 7, 6 };
+        int Calc(int[] w)
+        {
+            int sum = 0;
+            for (int i = 0; i < 8; i++) sum += (s[i] - '0') * w[i];
+            int r = sum % 11;
+            return r == 0 ? 0 : 11 - r;
+        }
+        int check = s[8] - '0';
+        int c = Calc(w1);
+        if (c == 10) { c = Calc(w2); if (c == 10) return false; }
+        return c == check;
     }
 
     /// <summary>Indonesia NIK (KTP): 16 digits with an embedded birth date at positions
