@@ -2,6 +2,7 @@
 // Copyright 2026 Adam Yang, Object IT Limited, Auckland, NZ
 
 using RedactWire.Rules.Localized.ArEg;
+using RedactWire.Rules.Localized.BnBd;
 using RedactWire.Rules.Localized.DeDe;
 using RedactWire.Rules.Localized.EnGb;
 using RedactWire.Rules.Localized.EnIn;
@@ -9,6 +10,7 @@ using RedactWire.Rules.Localized.EnNg;
 using RedactWire.Rules.Localized.EnPh;
 using RedactWire.Rules.Localized.EnPk;
 using RedactWire.Rules.Localized.EnUs;
+using RedactWire.Rules.Localized.EsEs;
 using RedactWire.Rules.Localized.EsMx;
 using RedactWire.Rules.Localized.FaIr;
 using RedactWire.Rules.Localized.FrFr;
@@ -78,5 +80,7 @@ internal static class DefaultRules
             ["th-TH"] = ThThRules.Rules,
             ["ko-KR"] = KoKrRules.Rules,
             ["it-IT"] = ItItRules.Rules,
+            ["es-ES"] = EsEsRules.Rules,
+            ["bn-BD"] = BnBdRules.Rules,
         };
 }

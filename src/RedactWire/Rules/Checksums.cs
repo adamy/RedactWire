@@ -341,6 +341,27 @@ internal static class Checksums
         return (gov >= 1 && gov <= 35) || gov == 88;   // 88 = born abroad
     }
 
+    /// <summary>Spain DNI / NIE: 8 digits (DNI) or X/Y/Z + 7 digits (NIE), plus a control
+    /// letter via mod-23. VERIFY: algorithm.</summary>
+    public static bool SpainDniNie(string raw)
+    {
+        const string letters = "TRWAGMYFPDXBNJZSQVHLCKE";
+        var s = raw.Replace("-", "").Replace(" ", "").ToUpperInvariant();
+        if (s.Length != 9) return false;
+        char last = s[8];
+        if (last < 'A' || last > 'Z') return false;
+
+        string digits;
+        char f = s[0];
+        if (f == 'X') digits = "0" + s.Substring(1, 7);
+        else if (f == 'Y') digits = "1" + s.Substring(1, 7);
+        else if (f == 'Z') digits = "2" + s.Substring(1, 7);
+        else if (f >= '0' && f <= '9') digits = s.Substring(0, 8);
+        else return false;
+
+        return long.TryParse(digits, out var n) && letters[(int)(n % 23)] == last;
+    }
+
     /// <summary>Indonesia NIK (KTP): 16 digits with an embedded birth date at positions
     /// 6..11 = DDMMYY (DD is +40 for females). No check digit, so we sanity-check the date.
     /// VERIFY: NIK structure.</summary>
