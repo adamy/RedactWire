@@ -95,6 +95,20 @@ internal static class Checksums
                && dob <= DateTime.Today && dob.Year >= 1900;
     }
 
+    /// <summary>Indonesia NIK (KTP): 16 digits with an embedded birth date at positions
+    /// 6..11 = DDMMYY (DD is +40 for females). No check digit, so we sanity-check the date.
+    /// VERIFY: NIK structure.</summary>
+    public static bool IndonesiaNik(string id)
+    {
+        if (id.Length != 16) return false;
+        for (int i = 0; i < 16; i++) if (id[i] < '0' || id[i] > '9') return false;
+
+        int dd = (id[6] - '0') * 10 + (id[7] - '0');
+        int mm = (id[8] - '0') * 10 + (id[9] - '0');
+        if (dd > 40) dd -= 40;                 // female
+        return dd >= 1 && dd <= 31 && mm >= 1 && mm <= 12;
+    }
+
     /// <summary>IBAN mod-97: move first 4 chars to the end, map A→10…Z→35, mod 97 == 1.</summary>
     public static bool IbanValid(string iban)
     {
