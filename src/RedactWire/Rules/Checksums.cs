@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2026 Adam Yang, Object IT Limited, Auckland, NZ
 
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -26,6 +27,31 @@ internal static class Checksums
             sum += d; dbl = !dbl;
         }
         return sum % 10 == 0;
+    }
+
+    /// <summary>China Resident Identity Card (GB 11643-1999): 18 chars, weighted mod-11
+    /// check digit (last char may be 'X') plus an embedded birth date sanity check.
+    /// VERIFY: algorithm per GB 11643-1999.</summary>
+    public static bool ChinaResidentId(string id)
+    {
+        if (id.Length != 18) return false;
+
+        int[] w = { 7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2 };
+        char[] map = { '1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2' };
+
+        int sum = 0;
+        for (int i = 0; i < 17; i++)
+        {
+            if (id[i] < '0' || id[i] > '9') return false;
+            sum += (id[i] - '0') * w[i];
+        }
+        if (char.ToUpperInvariant(id[17]) != map[sum % 11]) return false;
+
+        // Embedded birth date: positions 6..13 = yyyyMMdd, must be a real past date.
+        var ds = id.Substring(6, 8);
+        return DateTime.TryParseExact(ds, "yyyyMMdd",
+                   CultureInfo.InvariantCulture, DateTimeStyles.None, out var dob)
+               && dob <= DateTime.Today && dob.Year >= 1900;
     }
 
     /// <summary>IBAN mod-97: move first 4 chars to the end, map A→10…Z→35, mod 97 == 1.</summary>

@@ -2,6 +2,7 @@
 // Copyright 2026 Adam Yang, Object IT Limited, Auckland, NZ
 
 using RedactWire.Rules.Localized.EnUs;
+using RedactWire.Rules.Localized.ZhCn;
 
 namespace RedactWire.Rules;
 
@@ -38,5 +39,6 @@ internal static class DefaultRules
         new Dictionary<string, IPiiRule[]>(StringComparer.OrdinalIgnoreCase)
         {
             ["en-US"] = EnUsRules.Rules,
+            ["zh-CN"] = ZhCnRules.Rules,
         };
 }
