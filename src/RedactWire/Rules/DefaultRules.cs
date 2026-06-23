@@ -2,6 +2,7 @@
 // Copyright 2026 Adam Yang, Object IT Limited, Auckland, NZ
 
 using RedactWire.Rules.Localized.ArEg;
+using RedactWire.Rules.Localized.ArSa;
 using RedactWire.Rules.Localized.BnBd;
 using RedactWire.Rules.Localized.DaDk;
 using RedactWire.Rules.Localized.DeDe;
@@ -15,9 +16,13 @@ using RedactWire.Rules.Localized.EnPh;
 using RedactWire.Rules.Localized.EnPk;
 using RedactWire.Rules.Localized.EnUs;
 using RedactWire.Rules.Localized.EnZa;
+using RedactWire.Rules.Localized.EsAr;
+using RedactWire.Rules.Localized.EsCl;
+using RedactWire.Rules.Localized.EsCo;
 using RedactWire.Rules.Localized.EsEs;
 using RedactWire.Rules.Localized.EsMx;
 using RedactWire.Rules.Localized.FaIr;
+using RedactWire.Rules.Localized.HeIl;
 using RedactWire.Rules.Localized.FiFi;
 using RedactWire.Rules.Localized.FrFr;
 using RedactWire.Rules.Localized.IdId;
@@ -102,5 +107,10 @@ internal static class DefaultRules
             ["da-DK"] = DaDkRules.Rules,
             ["fi-FI"] = FiFiRules.Rules,
             ["en-ZA"] = EnZaRules.Rules,
+            ["ar-SA"] = ArSaRules.Rules,
+            ["es-AR"] = EsArRules.Rules,
+            ["he-IL"] = HeIlRules.Rules,
+            ["es-CL"] = EsClRules.Rules,
+            ["es-CO"] = EsCoRules.Rules,
         };
 }

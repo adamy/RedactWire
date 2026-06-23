@@ -501,6 +501,41 @@ internal static class Checksums
         return Luhn(d);
     }
 
+    /// <summary>Argentina CUIT/CUIL: 11 digits, weighted mod-11 check digit. VERIFY.</summary>
+    public static bool ArgentinaCuit(string raw)
+    {
+        var d = Digits(raw);
+        if (d.Length != 11) return false;
+        int[] w = { 5, 4, 3, 2, 7, 6, 5, 4, 3, 2 };
+        int sum = 0;
+        for (int i = 0; i < 10; i++) sum += (d[i] - '0') * w[i];
+        int check = 11 - sum % 11;
+        if (check == 11) check = 0;
+        if (check == 10) return false;
+        return check == d[10] - '0';
+    }
+
+    /// <summary>Chile RUT/RUN: body + check char (0-9 or K) via mod-11 with weights
+    /// cycling 2..7 from the right. VERIFY.</summary>
+    public static bool ChileRut(string raw)
+    {
+        var s = raw.Replace(".", "").Replace("-", "").ToUpperInvariant();
+        if (s.Length < 2) return false;
+        char checkChar = s[s.Length - 1];
+        string body = s.Substring(0, s.Length - 1);
+        foreach (char c in body) if (c < '0' || c > '9') return false;
+
+        int sum = 0, w = 2;
+        for (int i = body.Length - 1; i >= 0; i--)
+        {
+            sum += (body[i] - '0') * w;
+            w = w == 7 ? 2 : w + 1;
+        }
+        int m = 11 - sum % 11;
+        char expected = m == 11 ? '0' : m == 10 ? 'K' : (char)('0' + m);
+        return expected == checkChar;
+    }
+
     /// <summary>Indonesia NIK (KTP): 16 digits with an embedded birth date at positions
     /// 6..11 = DDMMYY (DD is +40 for females). No check digit, so we sanity-check the date.
     /// VERIFY: NIK structure.</summary>
