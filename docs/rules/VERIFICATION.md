@@ -22,8 +22,8 @@ internal consistency — it does **not** prove the algorithm matches the real-wo
 |---|---|---|---|
 | Luhn (cards, CA SIN) | Luhn mod-10 | Self-audited | universal, textbook |
 | IBAN | ISO 13616 mod-97 | Self-audited | universal |
-| China Resident ID | GB 11643 mod-11 + DOB | Self-audited | |
-| India Aadhaar | Verhoeff | Self-audited | |
+| China Resident ID | GB 11643 mod-11 + DOB | **Verified** | Wikipedia "Resident Identity Card" — weights + check-map array match exactly |
+| India Aadhaar | Verhoeff | **Verified** | Wikipedia "Verhoeff algorithm" — structure matches (i from right, p[i mod 8], collapse to 0) |
 | Brazil CPF / CNPJ | mod-11 ×2 | Self-audited | |
 | Russia INN / SNILS | mod-11 / control | Self-audited | |
 | Japan My Number | weighted mod-11 | Self-audited | |
@@ -32,15 +32,15 @@ internal consistency — it does **not** prove the algorithm matches the real-wo
 | **Italy Codice Fiscale** | odd/even maps, sum mod-26 | **Verified** | Wikipedia "Italian fiscal code" — tables match exactly |
 | **Finland HETU** | number mod-31 → char | **Verified** | Wikipedia "National identification number" — mod-31 over DDMMYYZZZ, same alphabet |
 | Turkey TC Kimlik | two check digits | Self-audited | |
-| France NIR | key = 97 − N mod 97 | Self-audited | Corsica (2A/2B) not handled |
+| France NIR | key = 97 − N mod 97 | **Verified** | Wikipedia "INSEE code" — key = 97 − (first 13 mod 97). Corsica (2A/2B) not handled |
 | UK NHS | weighted mod-11 | Self-audited | |
-| Spain DNI / NIE | mod-23 letter | Self-audited | |
+| Spain DNI / NIE | mod-23 letter | Self-audited | letter table TRWAGMYFPDXBNJZSQVHLCKE is canonical; source page 404'd, re-fetch |
 | Iran national ID | weighted mod-11 | Self-audited | |
 | Thailand national ID | weighted mod-11 | Self-audited | |
-| Korea RRN | weighted mod-11 + DOB | Self-audited | sensitive |
+| Korea RRN | weighted mod-11 + DOB | **Verified** | Wikipedia "Resident registration number" — weights 234567892345, [11−sum%11]%10 |
 | Australia TFN | weighted /11 | Self-audited | |
 | Netherlands BSN | 11-proef | Self-audited | |
-| Poland PESEL | weighted mod-10 + DOB | Self-audited | |
+| Poland PESEL | weighted mod-10 + DOB | **Verified** | Wikipedia "PESEL" — weights 1379137913, 10−sum%10, century month-offsets match exactly |
 | NZ IRD | IR weighted + secondary | Self-audited | from prior prototype |
 | Sweden personnummer | Luhn + DOB | Self-audited | |
 | Norway fødselsnummer | two control digits | Self-audited | |
