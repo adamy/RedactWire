@@ -536,6 +536,77 @@ internal static class Checksums
         return expected == checkChar;
     }
 
+    /// <summary>Hong Kong HKID: 1–2 letters + 6 digits + check (digit or A), weighted mod-11.
+    /// A single leading letter is padded with a space (value 36). VERIFY.</summary>
+    public static bool HongKongId(string raw)
+    {
+        var s = raw.ToUpperInvariant().Replace("(", "").Replace(")", "").Replace(" ", "");
+        if (s.Length != 8 && s.Length != 9) return false;
+        char checkChar = s[s.Length - 1];
+        string prefix = s.Substring(0, s.Length - 1);   // 7 or 8 chars
+        if (prefix.Length == 7) prefix = " " + prefix;   // pad single-letter form
+
+        int Val(char c) => c == ' ' ? 36 : c >= 'A' && c <= 'Z' ? c - 'A' + 10
+                          : c >= '0' && c <= '9' ? c - '0' : -1;
+        int sum = 0;
+        for (int i = 0; i < 8; i++)
+        {
+            int v = Val(prefix[i]);
+            if (v < 0) return false;
+            sum += v * (9 - i);
+        }
+        int check = (11 - sum % 11) % 11;
+        char expected = check == 10 ? 'A' : (char)('0' + check);
+        return expected == checkChar;
+    }
+
+    private static readonly Dictionary<char, int> TwLetters = new()
+    {
+        ['A'] = 10, ['B'] = 11, ['C'] = 12, ['D'] = 13, ['E'] = 14, ['F'] = 15, ['G'] = 16,
+        ['H'] = 17, ['I'] = 34, ['J'] = 18, ['K'] = 19, ['L'] = 20, ['M'] = 21, ['N'] = 22,
+        ['O'] = 35, ['P'] = 23, ['Q'] = 24, ['R'] = 25, ['S'] = 26, ['T'] = 27, ['U'] = 28,
+        ['V'] = 29, ['W'] = 32, ['X'] = 30, ['Y'] = 31, ['Z'] = 33,
+    };
+
+    /// <summary>Taiwan national ID: 1 letter + 9 digits (last is check), weighted mod-10.
+    /// VERIFY.</summary>
+    public static bool TaiwanId(string raw)
+    {
+        var s = raw.ToUpperInvariant();
+        if (s.Length != 10 || !TwLetters.TryGetValue(s[0], out int n)) return false;
+        int sum = n / 10 + n % 10 * 9;
+        int[] w = { 8, 7, 6, 5, 4, 3, 2, 1, 1 };
+        for (int i = 0; i < 9; i++)
+        {
+            if (s[1 + i] < '0' || s[1 + i] > '9') return false;
+            sum += (s[1 + i] - '0') * w[i];
+        }
+        return sum % 10 == 0;
+    }
+
+    /// <summary>Portugal NIF: 9 digits, weighted mod-11 check digit. VERIFY.</summary>
+    public static bool PortugalNif(string raw)
+    {
+        var d = Digits(raw);
+        if (d.Length != 9) return false;
+        int sum = 0;
+        for (int i = 0; i < 8; i++) sum += (d[i] - '0') * (9 - i);
+        int r = sum % 11;
+        int check = r < 2 ? 0 : 11 - r;
+        return check == d[8] - '0';
+    }
+
+    /// <summary>EAN-13 / GTIN-13 mod-10 check (used by Switzerland AHV "756…"). VERIFY.</summary>
+    public static bool Ean13(string raw)
+    {
+        var d = Digits(raw);
+        if (d.Length != 13) return false;
+        int sum = 0;
+        for (int i = 0; i < 12; i++) sum += (d[i] - '0') * (i % 2 == 0 ? 1 : 3);
+        int check = (10 - sum % 10) % 10;
+        return check == d[12] - '0';
+    }
+
     /// <summary>Indonesia NIK (KTP): 16 digits with an embedded birth date at positions
     /// 6..11 = DDMMYY (DD is +40 for females). No check digit, so we sanity-check the date.
     /// VERIFY: NIK structure.</summary>

@@ -5,6 +5,7 @@ using RedactWire.Rules.Localized.ArEg;
 using RedactWire.Rules.Localized.ArSa;
 using RedactWire.Rules.Localized.BnBd;
 using RedactWire.Rules.Localized.DaDk;
+using RedactWire.Rules.Localized.DeCh;
 using RedactWire.Rules.Localized.DeDe;
 using RedactWire.Rules.Localized.EnAu;
 using RedactWire.Rules.Localized.EnCa;
@@ -33,12 +34,16 @@ using RedactWire.Rules.Localized.NbNo;
 using RedactWire.Rules.Localized.NlNl;
 using RedactWire.Rules.Localized.PlPl;
 using RedactWire.Rules.Localized.PtBr;
+using RedactWire.Rules.Localized.PtPt;
 using RedactWire.Rules.Localized.RuRu;
 using RedactWire.Rules.Localized.SvSe;
 using RedactWire.Rules.Localized.ThTh;
 using RedactWire.Rules.Localized.TrTr;
 using RedactWire.Rules.Localized.ViVn;
 using RedactWire.Rules.Localized.ZhCn;
+using RedactWire.Rules.Localized.ZhHk;
+using RedactWire.Rules.Localized.ZhMo;
+using RedactWire.Rules.Localized.ZhTw;
 
 namespace RedactWire.Rules;
 
@@ -112,5 +117,10 @@ internal static class DefaultRules
             ["he-IL"] = HeIlRules.Rules,
             ["es-CL"] = EsClRules.Rules,
             ["es-CO"] = EsCoRules.Rules,
+            ["zh-HK"] = ZhHkRules.Rules,
+            ["zh-TW"] = ZhTwRules.Rules,
+            ["zh-MO"] = ZhMoRules.Rules,
+            ["pt-PT"] = PtPtRules.Rules,
+            ["de-CH"] = DeChRules.Rules,
         };
 }
