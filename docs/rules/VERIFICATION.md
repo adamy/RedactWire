@@ -7,10 +7,13 @@ Status: `Verified` (checked against a cited source) · `Self-audited` (logic re-
 memory + synthetic test vector passes, no external source yet) · `Assumption` (a rule we
 introduced without a known spec — must confirm).
 
-> Note on method: web verification was attempted (rate-limited; small-model page extraction
-> is unreliable and many Wikipedia pages omit the algorithm). Italy and Finland were
-> confirmed by an exact table match. The remaining rows still need a careful pass against
-> official country specifications.
+> Note on method: web verification was attempted. **7 confirmed exact** against Wikipedia
+> (Italy CF, Finland HETU, Verhoeff/Aadhaar, PESEL, France NIR, Korea RRN, China GB11643).
+> The remaining rows are standard textbook algorithms (Luhn, mod-11 CPF/CNPJ, ISO 7064
+> MOD 11,10, mod-23, BSN elfproef, etc.) with passing synthetic vectors — but their
+> Wikipedia pages omit the algorithm, so a final pass needs **official spec documents**
+> (e.g. OBMEP for CPF, gobernación.gob.mx for CURP, the ISO/IEC 7064 standard for the
+> German tax ID). The 7 verified ones were the most transcription-prone (custom tables).
 
 Test vectors: every checksum has a synthetic valid sample in the test suite (round-trips
 through the implemented algorithm), so a row that is only `Self-audited` still proves
