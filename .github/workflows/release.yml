@@ -19,6 +19,8 @@ env:
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write   # NuGet Trusted Publishing (OIDC)
     steps:
       - uses: actions/checkout@v4
         with:
@@ -49,13 +51,18 @@ jobs:
           -p:ContinuousIntegrationBuild=true
           -o artifacts
 
+      - name: NuGet login (Trusted Publishing, OIDC)
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841
+        id: nuget-login
+        with:
+          user: ${{ vars.NUGET_USER }}
+
       - name: Push to NuGet.org
         run: >
           dotnet nuget push "artifacts/*.nupkg"
+          --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
           --source https://api.nuget.org/v3/index.json
           --skip-duplicate
-        env:
-          DOTNET_ROOT: /usr/share/dotnet
 
 
       - uses: actions/upload-artifact@v4
