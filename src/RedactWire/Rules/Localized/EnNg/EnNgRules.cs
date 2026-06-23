@@ -13,8 +13,11 @@ internal static class EnNgRules
 {
     public static readonly IPiiRule[] Rules =
     {
-        // NIN: 11 digits, no checksum. Constrained to non-zero leading digit so it does
-        // not swallow 0-leading mobile numbers. (BVN shares the 11-digit shape.)
+        // NIN: 11 random digits, no checksum. NIN and a local mobile number are both 11
+        // digits and are genuinely ambiguous without context. Disambiguation heuristic:
+        // a 0-leading 11-digit string is treated as a phone (mobiles start 0), so NIN is
+        // matched only with a non-zero leading digit. Trade-off: misses the rare NIN that
+        // truly starts with 0, but never mislabels a phone as a NIN. (BVN shares the shape.)
         new RegexRule("Nin", PiiType.NationalId,
             @"(?<v>\b[1-9]\d{10}\b)",
             baseConfidence: 0.4),

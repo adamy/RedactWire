@@ -28,7 +28,8 @@ public class Tier3BatchATests
     [Fact] public void Nz_ird_valid() => Assert.Contains(M("en-NZ", "49091850"), m => m.Type == PiiType.TaxId);
     [Fact] public void Nz_ird_invalid() => Assert.DoesNotContain(M("en-NZ", "49091851"), m => m.Type == PiiType.TaxId);
     [Fact] public void Nz_driver_licence() => Assert.Contains(M("en-NZ", "AB123456"), m => m.Type == PiiType.DriverLicense);
-    [Fact] public void Nz_nhi() => Assert.Contains(M("en-NZ", "ABC1234"), m => m.Type == PiiType.Custom && m.Subtype == "NHI");
+    [Fact] public void Nz_nhi_legacy() => Assert.Contains(M("en-NZ", "ABC1234"), m => m.Type == PiiType.Custom && m.Subtype == "NHI");
+    [Fact] public void Nz_nhi_2019_form() => Assert.Contains(M("en-NZ", "ABC12DV"), m => m.Type == PiiType.Custom && m.Subtype == "NHI");
 
     // ── Netherlands ──────────────────────────────────────────────────────────────
     [Fact] public void Nl_bsn_valid() => Assert.Contains(M("nl-NL", "111222333"), m => m.Type == PiiType.NationalId);

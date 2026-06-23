@@ -59,15 +59,15 @@ internal consistency — it does **not** prove the algorithm matches the real-wo
 | Egypt national ID | century + DDMMYY + governorate | Self-audited | governorate set 01–35,88 needs confirm; "no check digit" claim to verify |
 | Denmark CPR | DDMMYY | Self-audited | mod-11 has documented exceptions |
 
-## Assumptions to confirm (introduced by us, no cited spec)
+## Assumptions — reviewed
 
-| Item | Assumption | Risk |
+| Item | Status | Note |
 |---|---|---|
-| **Nigeria NIN** | non-zero leading digit (to avoid mobile collision) | **High** — invented to disambiguate; confirm real NIN range |
-| NZ NHI | legacy `AAA####` form only; new alphanumeric form + check digit not done | Medium |
-| Egypt governorate | valid set = 01–35 plus 88 | Medium |
-| Many mobile patterns | per-country prefixes/lengths | Medium — number plans change |
-| Passport rules | loose `[A-Z]?\d+` shapes | Low (confidence already low) |
+| Nigeria NIN | **Resolved (documented heuristic)** | NIN is random 11 digits, *can* start with 0 (confirmed via NIMC/search). It is genuinely ambiguous with an 11-digit mobile and has no checksum. We keep the non-zero-leading rule as an explicit **disambiguation heuristic** (0-leading ⇒ phone), documented in code + pack doc. Trade-off: misses rare 0-leading NINs; never mislabels a phone. |
+| NZ NHI | **Fixed** | Added the 2019 `LLLNNLX` form alongside legacy `LLLNNNC` (Wikipedia "NHI Number"; I/O excluded). Check digit/char still not validated (format only). |
+| Egypt governorate | **Confirmed reasonable** | Positions 8–9 = governorate; 27 governorates + 88 (abroad). `01–35` plus `88` matches common open-source validators; range may include a few unused codes (minor FP). |
+| Many mobile patterns | Open | per-country prefixes/lengths — number plans change; verify per country |
+| Passport rules | Low | loose `[A-Z]?\d+` shapes; confidence already low by design |
 
 ## Phone / postal / passport
 

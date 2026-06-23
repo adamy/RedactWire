@@ -22,9 +22,11 @@ internal static class EnNzRules
             @"(?<v>\b[A-Za-z]{2}\d{6}\b)",
             baseConfidence: 0.6),
 
-        // NHI (health): 3 letters + 4 digits (legacy form). Custom type with a name.
+        // NHI (health): legacy LLLNNNC (3 letters + 4 digits) or the 2019 form LLLNNLX
+        // (3 letters + 2 digits + 2 letters). Letters exclude I and O. Check digit/char
+        // not validated yet (format only). Custom type with a name.
         new RegexRule("Nhi", PiiType.Custom,
-            @"(?<v>\b[A-HJ-NP-Za-hj-np-z]{3}\d{4}\b)",
+            @"(?<v>\b[A-HJ-NP-Za-hj-np-z]{3}(?:\d{4}|\d{2}[A-HJ-NP-Za-hj-np-z]{2})\b)",
             baseConfidence: 0.55,
             severity: PiiSeverity.Critical,
             subtype: "NHI"),

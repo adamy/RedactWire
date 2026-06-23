@@ -26,7 +26,8 @@ See [`../severity.md`](../severity.md).
 
 ## Notes / gotchas
 
-- NIN/BVN have no public checksum → confidence is the only defence; both are 11 digits
-  so an 11-digit hit could be either. NIN is constrained to a non-zero leading digit so a
-  0-leading mobile number is not misread as a NIN.
-- **Open:** dedicated BVN rule; verify NIN leading-digit rule.
+- NIN is 11 random digits with no checksum, and a local mobile number is also 11 digits —
+  genuinely ambiguous without context. **Disambiguation heuristic:** a 0-leading 11-digit
+  string is treated as a phone (mobiles start 0), so NIN matches only with a non-zero lead.
+  Trade-off: misses the rare NIN that truly starts with 0, but never mislabels a phone.
+- BVN shares the 11-digit shape. **Open:** dedicated BVN rule.
