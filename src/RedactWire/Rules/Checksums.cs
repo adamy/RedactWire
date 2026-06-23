@@ -689,6 +689,20 @@ internal static class Checksums
         return dd >= 1 && dd <= 31 && mm >= 1 && mm <= 12;
     }
 
+    /// <summary>Slovenia/ex-Yugoslav EMŠO (JMBG): 13 digits, weighted mod-11 check digit.
+    /// VERIFY.</summary>
+    public static bool SloveniaEmso(string raw)
+    {
+        var d = Digits(raw);
+        if (d.Length != 13) return false;
+        int[] w = { 7, 6, 5, 4, 3, 2, 7, 6, 5, 4, 3, 2 };
+        int sum = 0;
+        for (int i = 0; i < 12; i++) sum += (d[i] - '0') * w[i];
+        int m = sum % 11;
+        int check = m == 0 ? 0 : 11 - m;
+        return check < 10 && check == d[12] - '0';
+    }
+
     /// <summary>Indonesia NIK (KTP): 16 digits with an embedded birth date at positions
     /// 6..11 = DDMMYY (DD is +40 for females). No check digit, so we sanity-check the date.
     /// VERIFY: NIK structure.</summary>

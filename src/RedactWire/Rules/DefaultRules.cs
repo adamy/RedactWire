@@ -6,6 +6,7 @@ using RedactWire.Rules.Localized.ArSa;
 using RedactWire.Rules.Localized.BnBd;
 using RedactWire.Rules.Localized.CsCz;
 using RedactWire.Rules.Localized.DaDk;
+using RedactWire.Rules.Localized.DeAt;
 using RedactWire.Rules.Localized.DeCh;
 using RedactWire.Rules.Localized.DeDe;
 using RedactWire.Rules.Localized.EnAu;
@@ -34,6 +35,8 @@ using RedactWire.Rules.Localized.IdId;
 using RedactWire.Rules.Localized.ItIt;
 using RedactWire.Rules.Localized.JaJp;
 using RedactWire.Rules.Localized.KoKr;
+using RedactWire.Rules.Localized.LbLu;
+using RedactWire.Rules.Localized.LtLt;
 using RedactWire.Rules.Localized.NbNo;
 using RedactWire.Rules.Localized.NlBe;
 using RedactWire.Rules.Localized.NlNl;
@@ -41,6 +44,8 @@ using RedactWire.Rules.Localized.PlPl;
 using RedactWire.Rules.Localized.PtBr;
 using RedactWire.Rules.Localized.PtPt;
 using RedactWire.Rules.Localized.RuRu;
+using RedactWire.Rules.Localized.SkSk;
+using RedactWire.Rules.Localized.SlSi;
 using RedactWire.Rules.Localized.SvSe;
 using RedactWire.Rules.Localized.ThTh;
 using RedactWire.Rules.Localized.TrTr;
@@ -132,5 +137,10 @@ internal static class DefaultRules
             ["en-IE"] = EnIeRules.Rules,
             ["et-EE"] = EtEeRules.Rules,
             ["is-IS"] = IsIsRules.Rules,
+            ["sk-SK"] = SkSkRules.Rules,
+            ["sl-SI"] = SlSiRules.Rules,
+            ["lt-LT"] = LtLtRules.Rules,
+            ["lb-LU"] = LbLuRules.Rules,
+            ["de-AT"] = DeAtRules.Rules,
         };
 }
