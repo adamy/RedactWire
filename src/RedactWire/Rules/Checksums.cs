@@ -607,6 +607,88 @@ internal static class Checksums
         return check == d[12] - '0';
     }
 
+    /// <summary>Belgium national register number: 11 digits; last 2 = 97 − (first 9 mod 97),
+    /// with a "2" prepended for births from 2000. VERIFY.</summary>
+    public static bool BelgiumNn(string raw)
+    {
+        var d = Digits(raw);
+        if (d.Length != 11) return false;
+        long n9 = long.Parse(d.Substring(0, 9));
+        int given = int.Parse(d.Substring(9, 2));
+        int c1 = 97 - (int)(n9 % 97);
+        int c2 = 97 - (int)((2_000_000_000L + n9) % 97);
+        return given == c1 || given == c2;
+    }
+
+    /// <summary>Czech/Slovak rodné číslo: 10 digits, whole number divisible by 11, with an
+    /// embedded birth date (month +50 female, +20/+70 special cases). VERIFY.</summary>
+    public static bool CzechRc(string raw)
+    {
+        var d = Digits(raw);
+        if (d.Length != 10) return false;
+        long n = long.Parse(d);
+        if (n % 11 != 0) return false;
+        int mm = (d[2] - '0') * 10 + (d[3] - '0');
+        if (mm > 70) mm -= 70; else if (mm > 50) mm -= 50; else if (mm > 20) mm -= 20;
+        int dd = (d[4] - '0') * 10 + (d[5] - '0');
+        return mm >= 1 && mm <= 12 && dd >= 1 && dd <= 31;
+    }
+
+    /// <summary>Ireland PPS number: 7 digits + check letter (+ optional 2nd letter), mod-23.
+    /// VERIFY.</summary>
+    public static bool IrelandPps(string raw)
+    {
+        var s = raw.ToUpperInvariant();
+        if (s.Length < 8 || s.Length > 9) return false;
+        for (int i = 0; i < 7; i++) if (s[i] < '0' || s[i] > '9') return false;
+        char checkLetter = s[7];
+        int sum = 0;
+        for (int i = 0; i < 7; i++) sum += (s[i] - '0') * (8 - i);
+        if (s.Length == 9)
+        {
+            char w = s[8];
+            if (w < 'A' || w > 'W') return false;
+            sum += (w == 'W' ? 0 : w - 'A' + 1) * 9;
+        }
+        int rem = sum % 23;
+        char expected = rem == 0 ? 'W' : (char)('A' + rem - 1);
+        return expected == checkLetter;
+    }
+
+    /// <summary>Estonia isikukood: 11 digits, two-pass weighted mod-11 check. VERIFY.</summary>
+    public static bool EstoniaIk(string raw)
+    {
+        var d = Digits(raw);
+        if (d.Length != 11) return false;
+        int Weighted(int[] w)
+        {
+            int sum = 0;
+            for (int i = 0; i < 10; i++) sum += (d[i] - '0') * w[i];
+            return sum % 11;
+        }
+        int r = Weighted(new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 1 });
+        int check = r < 10 ? r : Weighted(new[] { 3, 4, 5, 6, 7, 8, 9, 1, 2, 3 });
+        if (check == 10) check = 0;
+        return check == d[10] - '0';
+    }
+
+    /// <summary>Iceland kennitala: 10 digits, weighted mod-11 check at position 9 plus an
+    /// embedded birth date (DDMMYY). VERIFY.</summary>
+    public static bool IcelandKennitala(string raw)
+    {
+        var d = Digits(raw);
+        if (d.Length != 10) return false;
+        int[] w = { 3, 2, 7, 6, 5, 4, 3, 2 };
+        int sum = 0;
+        for (int i = 0; i < 8; i++) sum += (d[i] - '0') * w[i];
+        int check = 11 - sum % 11;
+        if (check == 11) check = 0;
+        if (check == 10 || check != d[8] - '0') return false;
+        int dd = (d[0] - '0') * 10 + (d[1] - '0');
+        int mm = (d[2] - '0') * 10 + (d[3] - '0');
+        return dd >= 1 && dd <= 31 && mm >= 1 && mm <= 12;
+    }
+
     /// <summary>Indonesia NIK (KTP): 16 digits with an embedded birth date at positions
     /// 6..11 = DDMMYY (DD is +40 for females). No check digit, so we sanity-check the date.
     /// VERIFY: NIK structure.</summary>
