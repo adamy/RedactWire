@@ -15,6 +15,8 @@ namespace RedactWire;
 public sealed class PiiDetectorBuilder
 {
     private readonly List<IPiiRule> _invariant = new();
+    // Buckets are keyed by ISO-3166 region (country), so every culture of a country shares
+    // one pack. Cultures without a region fall back to keying by the culture name.
     private readonly Dictionary<string, List<IPiiRule>> _culture = new(StringComparer.OrdinalIgnoreCase);
     private readonly List<IPiiRule> _allCultureRules = new();
     private readonly List<CultureInfo> _defaults = new();
@@ -37,25 +39,29 @@ public sealed class PiiDetectorBuilder
     /// <summary>Completely empty builder — consumer wires everything.</summary>
     public static PiiDetectorBuilder CreateEmpty() => new();
 
-    /// <summary>Register the built-in rule pack for a culture (currently en-US) and
-    /// make it part of the default culture set used when Detect() is called without cultures.</summary>
+    /// <summary>Register the built-in rule pack for a culture's country and make it part of
+    /// the default culture set used when Detect() is called without cultures. The pack is
+    /// resolved by region, so any culture of a country (en-IN/hi-IN, en-CA/fr-CA, de-CH/fr-CH)
+    /// loads the same pack.</summary>
     public PiiDetectorBuilder AddCulture(CultureInfo culture)
     {
-        if (DefaultRules.ByCulture.TryGetValue(culture.Name, out var rules))
-        {
-            var bucket = GetBucket(culture.Name);
-            bucket.AddRange(rules);
-        }
+        var key = KeyFor(culture);
+        if (DefaultRules.ByRegion.TryGetValue(key, out var rules))
+            GetBucket(key).AddRange(rules);
         if (!_defaults.Any(c => c.Name == culture.Name)) _defaults.Add(culture);
         return this;
     }
 
-    /// <summary>Add a custom rule for a specific culture (extensibility hook).</summary>
+    /// <summary>Add a custom rule for a specific culture's country (extensibility hook).
+    /// Bound by region, so it applies to every culture of that country.</summary>
     public PiiDetectorBuilder AddRule(CultureInfo culture, IPiiRule rule)
     {
-        GetBucket(culture.Name).Add(rule);
+        GetBucket(KeyFor(culture)).Add(rule);
         return this;
     }
+
+    // Region (country) is the bucket key; cultures without a region key by their name.
+    private static string KeyFor(CultureInfo culture) => Regions.Of(culture.Name) ?? culture.Name;
 
     /// <summary>Add a custom rule to every configured culture (those added via
     /// <see cref="AddCulture"/>). Bound at <see cref="Build"/>, so call order vs
@@ -92,12 +98,13 @@ public sealed class PiiDetectorBuilder
             kv => kv.Key, kv => new List<IPiiRule>(kv.Value),
             StringComparer.OrdinalIgnoreCase);
 
-        // Bind "all configured cultures" rules to every configured culture's bucket.
+        // Bind "all configured cultures" rules to every configured country's bucket.
         if (_allCultureRules.Count > 0)
             foreach (var ci in defaults)
             {
-                if (!buckets.TryGetValue(ci.Name, out var list))
-                    buckets[ci.Name] = list = new List<IPiiRule>();
+                var key = KeyFor(ci);
+                if (!buckets.TryGetValue(key, out var list))
+                    buckets[key] = list = new List<IPiiRule>();
                 list.AddRange(_allCultureRules);
             }
 

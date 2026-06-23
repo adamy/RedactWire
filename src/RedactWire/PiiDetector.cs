@@ -115,9 +115,11 @@ public sealed class PiiDetector
 
     private IReadOnlyList<IPiiRule> ResolveRulesFor(CultureInfo ci)
     {
-        if (_cultureRules.TryGetValue(ci.Name, out var exact)) return exact;       // en-US
-        var neutral = ci.TwoLetterISOLanguageName;                                  // en
-        if (_cultureRules.TryGetValue(neutral, out var fb)) return fb;
+        // Packs are keyed by region (country), so en-IN / hi-IN / ta-IN all resolve here.
+        var region = Regions.Of(ci.Name);
+        if (region is not null && _cultureRules.TryGetValue(region, out var byRegion)) return byRegion;
+        // Fallback for cultures registered without a region (keyed by name).
+        if (_cultureRules.TryGetValue(ci.Name, out var byName)) return byName;
         return Array.Empty<IPiiRule>();
     }
 

@@ -40,7 +40,12 @@
 - Per-country rule packs are grouped by country: files under
   `Rules/Localized/<CountryCode>/` with namespace `RedactWire.Rules.Localized.<CountryCode>`
   (e.g. `EnUs/` → `RedactWire.Rules.Localized.EnUs`). Use the culture code with the hyphen
-  removed and PascalCased (`en-US` → `EnUs`). Register the pack in `DefaultRules.ByCulture`.
+  removed and PascalCased (`en-US` → `EnUs`). Register the pack in `DefaultRules.ByCulture`
+  under a representative culture (e.g. `en-IN`).
+- **Packs resolve by ISO-3166 region (country), not language** (`Regions.Of`, indexed in
+  `DefaultRules.ByRegion`). So every culture of a country shares one pack — `en-IN/hi-IN/ta-IN`,
+  `en-CA/fr-CA`, `de-CH/fr-CH/it-CH` all map to the same rules. No per-language registration
+  or `AddIndia()`-style helpers needed. `AvailableCultures` still lists representative codes.
 - Rule docs live in `docs/rules/` (`common.md` + `localized/<culture>.md`); each rule has
   a Severity column. Severity model: `docs/rules/severity.md`.
 - Detection rules implement `IPiiRule`; most are `RegexRule`. A rule reports raw

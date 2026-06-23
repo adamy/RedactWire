@@ -738,6 +738,29 @@ internal static class Checksums
         return m != 10 && m == d[10] - '0';
     }
 
+    /// <summary>Singapore NRIC/FIN: prefix letter + 7 digits + check letter, weighted mod-11
+    /// with a prefix-dependent check-letter table. VERIFY.</summary>
+    public static bool SingaporeNric(string raw)
+    {
+        var s = raw.ToUpperInvariant();
+        if (s.Length != 9) return false;
+        for (int i = 1; i <= 7; i++) if (s[i] < '0' || s[i] > '9') return false;
+
+        char prefix = s[0], check = s[8];
+        int[] w = { 2, 7, 6, 5, 4, 3, 2 };
+        int sum = 0;
+        for (int i = 0; i < 7; i++) sum += (s[1 + i] - '0') * w[i];
+        if (prefix == 'T' || prefix == 'G') sum += 4;
+        else if (prefix == 'M') sum += 3;
+        int r = sum % 11;
+
+        string? table = prefix is 'S' or 'T' ? "JZIHGFEDCBA"
+                      : prefix is 'F' or 'G' ? "XWUTRQPNMLK"
+                      : prefix == 'M' ? "XWUTRQPNJLK"
+                      : null;
+        return table is not null && table[r] == check;
+    }
+
     /// <summary>Indonesia NIK (KTP): 16 digits with an embedded birth date at positions
     /// 6..11 = DDMMYY (DD is +40 for females). No check digit, so we sanity-check the date.
     /// VERIFY: NIK structure.</summary>

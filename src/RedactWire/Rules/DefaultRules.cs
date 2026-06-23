@@ -19,6 +19,7 @@ using RedactWire.Rules.Localized.EnNg;
 using RedactWire.Rules.Localized.EnNz;
 using RedactWire.Rules.Localized.EnPh;
 using RedactWire.Rules.Localized.EnPk;
+using RedactWire.Rules.Localized.EnSg;
 using RedactWire.Rules.Localized.EnUs;
 using RedactWire.Rules.Localized.EnZa;
 using RedactWire.Rules.Localized.EsAr;
@@ -148,5 +149,21 @@ internal static class DefaultRules
             ["el-GR"] = ElGrRules.Rules,
             ["hu-HU"] = HuHuRules.Rules,
             ["lv-LV"] = LvLvRules.Rules,
+            ["en-SG"] = EnSgRules.Rules,
         };
+
+    // Packs are looked up by ISO-3166 region (country), not language, so every culture of a
+    // country shares one pack. Built from ByCulture (the representative culture per country).
+    public static readonly IReadOnlyDictionary<string, IPiiRule[]> ByRegion = BuildByRegion();
+
+    private static Dictionary<string, IPiiRule[]> BuildByRegion()
+    {
+        var map = new Dictionary<string, IPiiRule[]>(StringComparer.OrdinalIgnoreCase);
+        foreach (var kv in ByCulture)
+        {
+            var region = Regions.Of(kv.Key);
+            if (region is not null) map[region] = kv.Value;
+        }
+        return map;
+    }
 }
