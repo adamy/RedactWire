@@ -1,6 +1,10 @@
 # RedactWire
 
-A lightweight, culture-aware **PII detection and redaction** library for .NET.
+[![NuGet](https://img.shields.io/nuget/v/RedactWire.svg)](https://www.nuget.org/packages/RedactWire/)
+[![CI](https://github.com/adamy/RedactWire/actions/workflows/ci.yml/badge.svg)](https://github.com/adamy/RedactWire/actions/workflows/ci.yml)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+
+A lightweight, culture-aware **PII detection, validation and redaction** library for .NET.
 
 RedactWire is regex-first and checksum-validated: it doesn't just match patterns, it
 *verifies* them (Luhn for cards, mod-97 for IBAN, area/group rules for US SSNs), so a
@@ -18,8 +22,12 @@ that drives overlap resolution.
 
 - Invariant (country-agnostic) rules: **Email**, **Credit card** (Luhn), **IPv4**,
   **IBAN** (mod-97).
-- Per-country packs (currently **en-US**): **SSN**, **NANP phone**, **ZIP**,
-  **Passport**, and a composite **street address** rule with 50-state validation.
+- **Built-in packs for 50+ countries** (see [Coverage](#coverage)) — national IDs, tax
+  numbers, phones, passports, postcodes — most gated by the real check digit/algorithm.
+- **Region-based resolution:** a country's languages share one pack (`en-IN`/`hi-IN`/`ta-IN`,
+  `en-CA`/`fr-CA`, `de-CH`/`fr-CH`/`it-CH`, Singapore's four official languages), while the
+  same language across different countries stays distinct (`zh-CN`/`zh-TW`/`zh-HK`/`zh-SG`).
+- **Validation:** `Validate(value, [culture,] type)` → `Valid` / `Invalid` / `Unsupported`.
 - **Checksum gating:** a failed checksum drops the candidate — it is not reported as
   low-confidence noise.
 - **Severity model** (`Critical > High > Medium > Low`): the primary key for overlap
@@ -33,6 +41,27 @@ that drives overlap resolution.
   `Supported = false` instead of silently "passing".
 - **Extensible:** add your own rules per culture without forking (implement `IPiiRule`,
   or just use `RegexRule`).
+
+## Coverage
+
+Invariant (every culture): **Email**, **Credit card**, **IPv4**, **IBAN**.
+
+Built-in country packs (representative culture shown; all languages of a country resolve to
+the same pack):
+
+| Region | Packs |
+|---|---|
+| Americas | `en-US` `en-CA` `es-MX` `pt-BR` `es-AR` `es-CL` `es-CO` |
+| Europe | `en-GB` `fr-FR` `de-DE` `it-IT` `es-ES` `pt-PT` `nl-NL` `nl-BE` `de-CH` `de-AT` `pl-PL` `cs-CZ` `sk-SK` `hu-HU` `el-GR` `en-IE` `sv-SE` `nb-NO` `da-DK` `fi-FI` `is-IS` `et-EE` `lt-LT` `lv-LV` `sl-SI` `lb-LU` `ru-RU` `tr-TR` |
+| Asia-Pacific | `zh-CN` `zh-HK` `zh-TW` `zh-MO` `ja-JP` `ko-KR` `en-IN` `id-ID` `vi-VN` `th-TH` `en-PH` `en-PK` `bn-BD` `en-SG` `en-AU` `en-NZ` |
+| Middle East / Africa | `ar-SA` `ar-EG` `fa-IR` `he-IL` `en-NG` `en-ZA` |
+
+`PiiDetectorBuilder.AvailableCultures` returns this list at runtime. Each pack is documented
+under [`docs/rules/localized/`](docs/rules/localized/), with verification status in
+[`docs/rules/VERIFICATION.md`](docs/rules/VERIFICATION.md).
+
+> Patterns and checksums are being verified against authoritative sources (see the
+> verification log). Treat unverified packs as best-effort until confirmed.
 
 ## Install
 

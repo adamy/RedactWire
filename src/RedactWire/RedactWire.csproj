@@ -11,9 +11,36 @@
     <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
 
+  <!-- ── NuGet package metadata ─────────────────────────────────────────────── -->
+  <PropertyGroup>
+    <PackageId>RedactWire</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>Adam Yang</Authors>
+    <Company>Object IT Limited</Company>
+    <Product>RedactWire</Product>
+    <Description>Lightweight, culture-aware PII detection, validation and redaction for .NET. Regex-first and checksum-validated, with built-in rule packs for 50+ countries, structured scanning (JSON/XML/objects) and severity-driven overlap resolution.</Description>
+    <Copyright>Copyright 2026 Adam Yang, Object IT Limited, Auckland, NZ</Copyright>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/adamy/RedactWire</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/adamy/RedactWire</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>pii;privacy;gdpr;redaction;detection;anonymization;data-protection;ssn;creditcard;iban</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.9" />
     <PackageReference Include="System.Text.Json" Version="10.0.9" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Short, package-focused README (the long one lives at the repo root). -->
+    <None Include="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>
