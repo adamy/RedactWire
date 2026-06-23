@@ -703,6 +703,41 @@ internal static class Checksums
         return check < 10 && check == d[12] - '0';
     }
 
+    /// <summary>Greece AFM (tax): 9 digits; first 8 weighted by powers of two, mod-11 mod-10.
+    /// VERIFY.</summary>
+    public static bool GreeceAfm(string raw)
+    {
+        var d = Digits(raw);
+        if (d.Length != 9) return false;
+        int sum = 0;
+        for (int i = 0; i < 8; i++) sum += (d[i] - '0') * (1 << (8 - i));
+        return sum % 11 % 10 == d[8] - '0';
+    }
+
+    /// <summary>Greece AMKA (social security): 11 digits, Luhn plus an embedded birth date
+    /// (DDMMYY). VERIFY.</summary>
+    public static bool GreeceAmka(string raw)
+    {
+        var d = Digits(raw);
+        if (d.Length != 11) return false;
+        int dd = (d[0] - '0') * 10 + (d[1] - '0');
+        int mm = (d[2] - '0') * 10 + (d[3] - '0');
+        if (dd < 1 || dd > 31 || mm < 1 || mm > 12) return false;
+        return Luhn(d);
+    }
+
+    /// <summary>Hungary personal identification number: 11 digits, weighted mod-11 check.
+    /// VERIFY.</summary>
+    public static bool HungaryId(string raw)
+    {
+        var d = Digits(raw);
+        if (d.Length != 11) return false;
+        int sum = 0;
+        for (int i = 0; i < 10; i++) sum += (d[i] - '0') * (i + 1);
+        int m = sum % 11;
+        return m != 10 && m == d[10] - '0';
+    }
+
     /// <summary>Indonesia NIK (KTP): 16 digits with an embedded birth date at positions
     /// 6..11 = DDMMYY (DD is +40 for females). No check digit, so we sanity-check the date.
     /// VERIFY: NIK structure.</summary>

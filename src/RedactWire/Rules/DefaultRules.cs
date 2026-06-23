@@ -9,6 +9,7 @@ using RedactWire.Rules.Localized.DaDk;
 using RedactWire.Rules.Localized.DeAt;
 using RedactWire.Rules.Localized.DeCh;
 using RedactWire.Rules.Localized.DeDe;
+using RedactWire.Rules.Localized.ElGr;
 using RedactWire.Rules.Localized.EnAu;
 using RedactWire.Rules.Localized.EnCa;
 using RedactWire.Rules.Localized.EnGb;
@@ -28,6 +29,7 @@ using RedactWire.Rules.Localized.EsMx;
 using RedactWire.Rules.Localized.EtEe;
 using RedactWire.Rules.Localized.FaIr;
 using RedactWire.Rules.Localized.HeIl;
+using RedactWire.Rules.Localized.HuHu;
 using RedactWire.Rules.Localized.FiFi;
 using RedactWire.Rules.Localized.IsIs;
 using RedactWire.Rules.Localized.FrFr;
@@ -37,6 +39,7 @@ using RedactWire.Rules.Localized.JaJp;
 using RedactWire.Rules.Localized.KoKr;
 using RedactWire.Rules.Localized.LbLu;
 using RedactWire.Rules.Localized.LtLt;
+using RedactWire.Rules.Localized.LvLv;
 using RedactWire.Rules.Localized.NbNo;
 using RedactWire.Rules.Localized.NlBe;
 using RedactWire.Rules.Localized.NlNl;
@@ -142,5 +145,8 @@ internal static class DefaultRules
             ["lt-LT"] = LtLtRules.Rules,
             ["lb-LU"] = LbLuRules.Rules,
             ["de-AT"] = DeAtRules.Rules,
+            ["el-GR"] = ElGrRules.Rules,
+            ["hu-HU"] = HuHuRules.Rules,
+            ["lv-LV"] = LvLvRules.Rules,
         };
 }
