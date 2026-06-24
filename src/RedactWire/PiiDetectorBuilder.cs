@@ -89,6 +89,44 @@ public sealed class PiiDetectorBuilder
         return this;
     }
 
+    /// <summary>Remove every already-registered rule (built-in or custom) matching
+    /// <paramref name="predicate"/>, across invariant, all cultures, and all-culture rules.
+    /// Call after the <c>Add*</c> that loaded the rules (e.g. after <see cref="AddCulture"/>).</summary>
+    public PiiDetectorBuilder RemoveRules(Func<IPiiRule, bool> predicate)
+    {
+        if (predicate is null) throw new ArgumentNullException(nameof(predicate));
+        _invariant.RemoveAll(r => predicate(r));
+        foreach (var bucket in _culture.Values) bucket.RemoveAll(r => predicate(r));
+        _allCultureRules.RemoveAll(r => predicate(r));
+        return this;
+    }
+
+    /// <summary>Remove built-in/custom rules by <paramref name="type"/> (and optional
+    /// <paramref name="subtype"/>) — e.g. <c>RemoveRule(PiiType.PostalCode)</c> or
+    /// <c>RemoveRule(PiiType.Secret, "OpenAiKey")</c>.</summary>
+    public PiiDetectorBuilder RemoveRule(PiiType type, string? subtype = null) =>
+        RemoveRules(r => r.Type == type
+            && (subtype is null || string.Equals(r.Subtype, subtype, StringComparison.OrdinalIgnoreCase)));
+
+    /// <summary>Replace an invariant rule with your own: removes any invariant rule sharing
+    /// <paramref name="rule"/>.Name, then adds it. (e.g. swap the built-in Email rule.)</summary>
+    public PiiDetectorBuilder ReplaceInvariantRule(IPiiRule rule)
+    {
+        _invariant.RemoveAll(r => string.Equals(r.Name, rule.Name, StringComparison.OrdinalIgnoreCase));
+        _invariant.Add(rule);
+        return this;
+    }
+
+    /// <summary>Replace a rule for a culture's country with your own: removes any rule in
+    /// that region sharing <paramref name="rule"/>.Name, then adds it.</summary>
+    public PiiDetectorBuilder ReplaceRule(CultureInfo culture, IPiiRule rule)
+    {
+        var bucket = GetBucket(KeyFor(culture));
+        bucket.RemoveAll(r => string.Equals(r.Name, rule.Name, StringComparison.OrdinalIgnoreCase));
+        bucket.Add(rule);
+        return this;
+    }
+
     public PiiDetectorBuilder UseOverlapStrategy(OverlapStrategy strategy)
     {
         _overlap = strategy;

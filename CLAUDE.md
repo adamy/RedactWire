@@ -61,6 +61,10 @@
   low-confidence match).
 - Builder rule registration: `AddRule(culture, rule)` (one culture), `AddRule(rule)`
   (all configured cultures, bound at `Build`), `AddInvariantRule(rule)` (always-on).
+- Builder rule removal/override: `RemoveRule(type[, subtype])` / `RemoveRules(predicate)`
+  drop built-in or custom rules; `ReplaceInvariantRule(rule)` / `ReplaceRule(culture, rule)`
+  swap a rule by `Name`. `IPiiRule` exposes `Subtype` so removal can match type+subtype.
+  Call these after the `Add*` that loaded the rules.
 - `PiiType` is a fixed enum (enums aren't extensible). For consumer types that don't fit,
   use `PiiType.Custom` + `RuleHit.Subtype` (the name); it flows to `PiiMatch.Subtype` and
   redaction labels (`[Subtype ?? Type]`).

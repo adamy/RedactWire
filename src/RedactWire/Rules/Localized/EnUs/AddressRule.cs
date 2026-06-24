@@ -15,6 +15,7 @@ public sealed class AddressRule : IPiiRule
 {
     public string Name => "Address";
     public PiiType Type => PiiType.Address;
+    public string? Subtype => null;
 
     private const RegexOptions Opts =
         RegexOptions.Compiled | RegexOptions.CultureInvariant;

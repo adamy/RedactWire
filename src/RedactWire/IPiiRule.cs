@@ -35,6 +35,10 @@ public interface IPiiRule
     /// <summary>Unique within a pack, e.g. "SSN".</summary>
     string Name { get; }
     PiiType Type { get; }
+    /// <summary>Optional sub-type this rule emits (e.g. "OpenAiKey" for a
+    /// <see cref="PiiType.Secret"/> rule); null for plain typed rules. Lets the builder
+    /// remove/replace a built-in rule by type + subtype.</summary>
+    string? Subtype { get; }
     /// <summary>Find every match in <paramref name="text"/>.</summary>
     IEnumerable<RuleHit> Find(string text);
 }
@@ -52,6 +56,7 @@ public sealed class RegexRule : IPiiRule
 
     public string Name { get; }
     public PiiType Type { get; }
+    public string? Subtype => _subtype;
 
     public RegexRule(string name, PiiType type, string pattern,
         double baseConfidence = 0.6,

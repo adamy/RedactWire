@@ -1,6 +1,7 @@
 # RedactWire
 
 [![NuGet](https://img.shields.io/nuget/v/RedactWire.svg)](https://www.nuget.org/packages/RedactWire/)
+[![Downloads](https://img.shields.io/nuget/dt/RedactWire.svg)](https://www.nuget.org/packages/RedactWire/)
 [![CI](https://github.com/adamy/RedactWire/actions/workflows/ci.yml/badge.svg)](https://github.com/adamy/RedactWire/actions/workflows/ci.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
@@ -240,6 +241,23 @@ var detector = PiiDetectorBuilder.CreateDefault()
     .AddRule(new MyRule())   // bind to every configured culture at once
     .Build();
 ```
+
+### Remove or replace a built-in rule
+
+```csharp
+PiiDetectorBuilder.CreateDefault()
+    .AddCulture(new CultureInfo("en-US"))
+    .AddSecretDetection()
+    .RemoveRule(PiiType.PostalCode)              // drop ZIP/postcode rules (too noisy)
+    .RemoveRule(PiiType.Secret, "OpenAiKey")     // drop one secret type, keep the rest
+    .ReplaceInvariantRule(new RegexRule("Email", PiiType.Email, myStricterEmailPattern))
+    .ReplaceRule(new CultureInfo("en-US"), myUsPhoneRule)   // override by rule Name
+    .Build();
+```
+
+`RemoveRule(type[, subtype])` removes built-in or custom rules everywhere; `ReplaceRule` /
+`ReplaceInvariantRule` swap a rule sharing the same `Name`. Call them after the `Add*` that
+loaded the rules.
 
 ### Custom PII types
 

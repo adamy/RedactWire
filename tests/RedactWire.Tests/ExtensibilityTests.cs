@@ -21,6 +21,7 @@ public class ExtensibilityTests
 
         public string Name => "Token";
         public PiiType Type { get; }
+        public string? Subtype => null;
 
         public IEnumerable<RuleHit> Find(string text)
         {
@@ -84,6 +85,7 @@ public class ExtensibilityTests
     {
         public string Name => "NhiNumber";
         public PiiType Type => PiiType.Custom;
+        public string? Subtype => "NhiNumber";
 
         public IEnumerable<RuleHit> Find(string text)
         {
