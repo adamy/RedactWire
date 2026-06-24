@@ -14,7 +14,7 @@
   <!-- ── NuGet package metadata ─────────────────────────────────────────────── -->
   <PropertyGroup>
     <PackageId>RedactWire</PackageId>
-    <Version>0.1.0</Version>
+    <Version>0.2.2</Version>
     <Authors>Adam Yang</Authors>
     <Company>Object IT Limited</Company>
     <Product>RedactWire</Product>

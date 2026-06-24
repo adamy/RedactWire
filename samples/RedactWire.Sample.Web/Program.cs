@@ -15,6 +15,8 @@ builder.Services.AddRedactWire(b =>
 {
     foreach (var culture in PiiDetectorBuilder.AvailableCultures)
         b.AddCulture(new CultureInfo(culture));
+
+    b.AddSecretDetection();
 });
 
 var app = builder.Build();

@@ -32,7 +32,11 @@ public class IndexModel : PageModel
     public void OnGet()
     {
         Input ??= "Email john@x.co.nz, SSN 123-45-6789, call (415) 555-0132,\n"
-                + "card 4242 4242 4242 4242, 123 Main St, Springfield, IL 62704";
+                + "card 4242 4242 4242 4242, 123 Main St, Springfield, IL 62704 \n"
+                // Sample JWT (jwt.io demo token — not a real credential).
+                + "token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9."
+                + "eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ."
+                + "SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
     }
 
     public void OnPost()
