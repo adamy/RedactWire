@@ -22,6 +22,9 @@ that drives overlap resolution.
 
 - Invariant (country-agnostic) rules: **Email**, **Credit card** (Luhn), **IPv4**,
   **IBAN** (mod-97).
+- **Secret detection** — API keys & tokens (OpenAI, AWS, GitHub, Stripe, Slack, Google,
+  SendGrid, npm), **JWT**, and **PEM private keys**. Opt-in via `AddSecretDetection()`
+  (on by default in the static `Redactor`). Ideal for scrubbing AI/LLM logs.
 - **Built-in packs for 50+ countries** (see [Coverage](#coverage)) — national IDs, tax
   numbers, phones, passports, postcodes — most gated by the real check digit/algorithm.
 - **Region-based resolution:** a country's languages share one pack (`en-IN`/`hi-IN`/`ta-IN`,
@@ -157,6 +160,22 @@ detector.Validate("112-233-445 95", new CultureInfo("ru-RU"), PiiType.Custom, "S
 
 The no-culture overload validates against the detector's configured cultures; pass a
 `CultureInfo` to target one. Must be a full-string match (surrounding whitespace ignored).
+
+## Secret detection
+
+API keys, tokens and private keys — country-agnostic, so they run as invariant rules.
+
+```csharp
+var d = PiiDetectorBuilder.CreateDefault().AddSecretDetection().Build();
+foreach (var m in d.Detect("OPENAI_API_KEY=sk-abc...xyz").AllMatches.Where(m => m.Type == PiiType.Secret))
+    Console.WriteLine(m.Subtype);   // OpenAiKey
+
+Redactor.Redact("aws key AKIAIOSFODNN7EXAMPLE");   // "aws key ***************..." (secrets on by default)
+```
+
+Covers OpenAI, AWS access-key-id, GitHub, Stripe, Slack, Google, SendGrid, npm, JWT and PEM
+private keys (high-precision, provider-prefixed). AWS *secret* keys / Azure keys / connection
+strings need entropy/context and are a later phase. See [`docs/rules/secrets.md`](docs/rules/secrets.md).
 
 ## Structured scanning (JSON / XML / objects)
 

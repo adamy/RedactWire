@@ -75,6 +75,9 @@ public enum PiiType
     [DefaultSeverity(PiiSeverity.High)] Person,
     [DefaultSeverity(PiiSeverity.Low)] Organization,
 
+    // Secret / credential (API key, token, connection string). Provider goes in Subtype.
+    [DefaultSeverity(PiiSeverity.Critical)] Secret,
+
     // Escape hatch: a consumer PII type that doesn't fit the above (enums can't be
     // extended). Pair with RuleHit.Subtype for a real name and override the severity.
     [DefaultSeverity(PiiSeverity.Medium)] Custom,

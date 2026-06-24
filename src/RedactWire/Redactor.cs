@@ -20,10 +20,11 @@ public static class Redactor
 {
     private static readonly Lazy<PiiDetector> _default = new(() =>
         PiiDetectorBuilder.CreateDefault()
+            .AddSecretDetection()
             .AddCulture(new CultureInfo("en-US"))
             .Build());
 
-    /// <summary>The shared default detector (invariant + en-US).</summary>
+    /// <summary>The shared default detector (invariant + secrets + en-US).</summary>
     public static PiiDetector Default => _default.Value;
 
     public static PiiResult Detect(string text, params CultureInfo[] cultures) =>

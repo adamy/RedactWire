@@ -7,6 +7,8 @@ credit card, and a national ID with a bad check digit is dropped, not guessed.
 - Targets `netstandard2.0` (works on .NET Framework 4.6.1+, .NET Core/5–8+, Mono, Unity).
 - Built-in packs for **50+ countries** (national IDs, tax numbers, phones, passports,
   postcodes), most gated by the real check-digit algorithm.
+- **Secret detection** — API keys & tokens (OpenAI, AWS, GitHub, Stripe, Slack, Google,
+  SendGrid, npm), JWT, PEM private keys — via `AddSecretDetection()`. Great for AI/LLM logs.
 - Structured scanning of **JSON / XML / objects**; severity-driven overlap resolution;
   redaction (mask / remove / label / custom).
 

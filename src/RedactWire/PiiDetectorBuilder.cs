@@ -80,6 +80,15 @@ public sealed class PiiDetectorBuilder
         return this;
     }
 
+    /// <summary>Enable built-in secret/credential detection (API keys, tokens, private keys).
+    /// These are country-agnostic, so they run as invariant rules. Matches are
+    /// <see cref="PiiType.Secret"/> with the provider in <see cref="PiiMatch.Subtype"/>.</summary>
+    public PiiDetectorBuilder AddSecretDetection()
+    {
+        foreach (var r in Rules.Secrets.SecretRules.Rules) _invariant.Add(r);
+        return this;
+    }
+
     public PiiDetectorBuilder UseOverlapStrategy(OverlapStrategy strategy)
     {
         _overlap = strategy;

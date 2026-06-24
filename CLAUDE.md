@@ -46,6 +46,12 @@
   `DefaultRules.ByRegion`). So every culture of a country shares one pack — `en-IN/hi-IN/ta-IN`,
   `en-CA/fr-CA`, `de-CH/fr-CH/it-CH` all map to the same rules. No per-language registration
   or `AddIndia()`-style helpers needed. `AvailableCultures` still lists representative codes.
+- Secret/credential detection (API keys, tokens, JWT, PEM private keys) lives in
+  `Rules/Secrets/SecretRules.cs` — country-agnostic, so it registers as invariant rules via
+  `PiiDetectorBuilder.AddSecretDetection()` (on by default in the static `Redactor`). Emits
+  `PiiType.Secret` with the provider in `Subtype`. v1 is provider-prefixed high-precision;
+  entropy/context secrets (AWS secret key, connection strings) are a later phase. Doc:
+  `docs/rules/secrets.md`.
 - Rule docs live in `docs/rules/` (`common.md` + `localized/<culture>.md`); each rule has
   a Severity column. Severity model: `docs/rules/severity.md`.
 - Detection rules implement `IPiiRule`; most are `RegexRule`. A rule reports raw
