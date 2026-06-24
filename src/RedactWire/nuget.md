@@ -9,8 +9,10 @@ credit card, and a national ID with a bad check digit is dropped, not guessed.
   postcodes), most gated by the real check-digit algorithm.
 - **Secret detection** — API keys & tokens (OpenAI, AWS, GitHub, Stripe, Slack, Google,
   SendGrid, npm), JWT, PEM private keys — via `AddSecretDetection()`. Great for AI/LLM logs.
-- Structured scanning of **JSON / XML / objects**; severity-driven overlap resolution;
-  redaction (mask / remove / label / custom).
+- Severity-driven overlap resolution; redaction (mask / remove / label / custom).
+- Structured scanning of **JSON / XML / objects** is an opt-in add-on —
+  [`RedactWire.Structured`](https://www.nuget.org/packages/RedactWire.Structured/) — so this
+  core package carries no `System.Text.Json` dependency.
 
 ## Quick start
 
