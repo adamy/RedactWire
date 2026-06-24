@@ -24,7 +24,7 @@
     <PackageProjectUrl>https://github.com/adamy/RedactWire</PackageProjectUrl>
     <RepositoryUrl>https://github.com/adamy/RedactWire</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>pii;privacy;gdpr;redaction;detection;anonymization;data-protection;ssn;creditcard;iban</PackageTags>
+    <PackageTags>pii;privacy;gdpr;redaction;detection;anonymization;data-protection;dlp;compliance;national-id;tax-id;creditcard;iban;ssn;sin;nino;tfn;medicare;ird;nric;mykad;aadhaar;pan;cpf;cnpj;curp;rfc;steuer-id;nir;bsn;dni;codice-fiscale;nif;pesel;personnummer;hetu;cpr;rrn;my-number;hkid</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>

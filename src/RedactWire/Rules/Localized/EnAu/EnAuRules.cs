@@ -17,6 +17,14 @@ internal static class EnAuRules
             baseConfidence: 0.4,
             validate: v => Checksums.AustraliaTfn(v) ? (true, 0.9) : (false, 0)),
 
+        // Medicare card: 10 digits, mod-10 check. Custom type with a name.
+        new RegexRule("Medicare", PiiType.Custom,
+            @"(?<v>\b[2-6]\d{9}\b)",
+            baseConfidence: 0.4,
+            validate: v => Checksums.AustraliaMedicare(v) ? (true, 0.92) : (false, 0),
+            severity: PiiSeverity.Critical,
+            subtype: "Medicare"),
+
         // Mobile: (+61 | 0) 4 + 8 digits.
         new RegexRule("Mobile", PiiType.Phone,
             @"(?<v>\b(?:\+?61|0)4\d{8}\b)",

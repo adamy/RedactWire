@@ -761,6 +761,30 @@ internal static class Checksums
         return table is not null && table[r] == check;
     }
 
+    /// <summary>Australia Medicare card: 10 digits; first 8 weighted, mod-10 check at the
+    /// 9th digit (10th is the issue number). First digit is 2-6. VERIFY.</summary>
+    public static bool AustraliaMedicare(string raw)
+    {
+        var d = Digits(raw);
+        if (d.Length != 10 || d[0] < '2' || d[0] > '6') return false;
+        int[] w = { 1, 3, 7, 9, 1, 3, 7, 9 };
+        int sum = 0;
+        for (int i = 0; i < 8; i++) sum += (d[i] - '0') * w[i];
+        return sum % 10 == d[8] - '0';
+    }
+
+    /// <summary>Malaysia MyKad (NRIC): 12 digits, YYMMDD + place-of-birth code + serial.
+    /// No check digit, so the birth date and PB code are sanity-checked. VERIFY.</summary>
+    public static bool MalaysiaMyKad(string raw)
+    {
+        var d = Digits(raw);
+        if (d.Length != 12) return false;
+        int mm = (d[2] - '0') * 10 + (d[3] - '0');
+        int dd = (d[4] - '0') * 10 + (d[5] - '0');
+        int pb = (d[6] - '0') * 10 + (d[7] - '0');
+        return mm >= 1 && mm <= 12 && dd >= 1 && dd <= 31 && pb >= 1 && pb != 0;
+    }
+
     /// <summary>Indonesia NIK (KTP): 16 digits with an embedded birth date at positions
     /// 6..11 = DDMMYY (DD is +40 for females). No check digit, so we sanity-check the date.
     /// VERIFY: NIK structure.</summary>

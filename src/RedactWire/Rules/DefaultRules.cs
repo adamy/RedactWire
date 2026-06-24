@@ -41,6 +41,7 @@ using RedactWire.Rules.Localized.KoKr;
 using RedactWire.Rules.Localized.LbLu;
 using RedactWire.Rules.Localized.LtLt;
 using RedactWire.Rules.Localized.LvLv;
+using RedactWire.Rules.Localized.MsMy;
 using RedactWire.Rules.Localized.NbNo;
 using RedactWire.Rules.Localized.NlBe;
 using RedactWire.Rules.Localized.NlNl;
@@ -150,6 +151,7 @@ internal static class DefaultRules
             ["hu-HU"] = HuHuRules.Rules,
             ["lv-LV"] = LvLvRules.Rules,
             ["en-SG"] = EnSgRules.Rules,
+            ["ms-MY"] = MsMyRules.Rules,
         };
 
     // Packs are looked up by ISO-3166 region (country), not language, so every culture of a

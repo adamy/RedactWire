@@ -53,7 +53,7 @@ the same pack):
 |---|---|
 | Americas | `en-US` `en-CA` `es-MX` `pt-BR` `es-AR` `es-CL` `es-CO` |
 | Europe | `en-GB` `fr-FR` `de-DE` `it-IT` `es-ES` `pt-PT` `nl-NL` `nl-BE` `de-CH` `de-AT` `pl-PL` `cs-CZ` `sk-SK` `hu-HU` `el-GR` `en-IE` `sv-SE` `nb-NO` `da-DK` `fi-FI` `is-IS` `et-EE` `lt-LT` `lv-LV` `sl-SI` `lb-LU` `ru-RU` `tr-TR` |
-| Asia-Pacific | `zh-CN` `zh-HK` `zh-TW` `zh-MO` `ja-JP` `ko-KR` `en-IN` `id-ID` `vi-VN` `th-TH` `en-PH` `en-PK` `bn-BD` `en-SG` `en-AU` `en-NZ` |
+| Asia-Pacific | `zh-CN` `zh-HK` `zh-TW` `zh-MO` `ja-JP` `ko-KR` `en-IN` `id-ID` `vi-VN` `th-TH` `en-PH` `en-PK` `bn-BD` `en-SG` `ms-MY` `en-AU` `en-NZ` |
 | Middle East / Africa | `ar-SA` `ar-EG` `fa-IR` `he-IL` `en-NG` `en-ZA` |
 
 `PiiDetectorBuilder.AvailableCultures` returns this list at runtime. Each pack is documented
