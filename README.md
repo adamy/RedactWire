@@ -60,6 +60,13 @@ the same pack):
 under [`docs/rules/localized/`](docs/rules/localized/), with verification status in
 [`docs/rules/VERIFICATION.md`](docs/rules/VERIFICATION.md).
 
+**Identifiers (searchable, incl. local names):**
+SSN · SIN · NINO · NHS · TFN · Medicare · IRD · NRIC · MyKad · Aadhaar · PAN · CPF · CNPJ ·
+CURP · RFC · Steuer-ID · NIR · BSN · DNI/NIE · Codice Fiscale · NIF · PESEL · Personnummer ·
+Fødselsnummer · HETU · CPR · RRN · My Number · HKID ·
+身份证 · 居民身份证 · 身分證 · 香港身份證 · マイナンバー · 個人番号 · 주민등록번호 ·
+ИНН · СНИЛС · บัตรประชาชน · ΑΦΜ · ΑΜΚΑ · आधार · CCCD.
+
 > Patterns and checksums are being verified against authoritative sources (see the
 > verification log). Treat unverified packs as best-effort until confirmed.
 
