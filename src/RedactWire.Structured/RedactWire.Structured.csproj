@@ -25,6 +25,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>pii;pii-detection;redaction;privacy;json;xml;structured;jsonpath;xpath;data-protection;dotnet</PackageTags>
     <PackageReadmeFile>nuget.md</PackageReadmeFile>
+    <PackageReleaseNotes>0.4.0 — New add-on holding RedactWire's structured scanning (JSON/XML/object), split out of core so string-only users don't pull System.Text.Json. Requires the RedactWire package (pulled in automatically). Call detector.DetectJson/DetectXml/DetectObject or Redactor.Default.DetectJson(...).</PackageReleaseNotes>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
