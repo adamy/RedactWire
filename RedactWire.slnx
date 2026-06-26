@@ -4,9 +4,11 @@
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/RedactWire.Cli/RedactWire.Cli.csproj" />
+    <Project Path="src/RedactWire.Structured/RedactWire.Structured.csproj" />
     <Project Path="src/RedactWire/RedactWire.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/RedactWire.Structured.Tests/RedactWire.Structured.Tests.csproj" />
     <Project Path="tests/RedactWire.Tests/RedactWire.Tests.csproj" />
   </Folder>
 </Solution>

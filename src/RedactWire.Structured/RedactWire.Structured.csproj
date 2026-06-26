@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <!-- ── NuGet package metadata ─────────────────────────────────────────────── -->
+  <PropertyGroup>
+    <PackageId>RedactWire.Structured</PackageId>
+    <Version>0.4.0</Version>
+    <Authors>Adam Yang</Authors>
+    <Company>Object IT Limited</Company>
+    <Product>RedactWire</Product>
+    <Description>Structured PII scanning add-on for RedactWire — detect PII inside JSON, XML and object graphs, each hit located by JSONPath / XPath / property path. Adds a System.Text.Json dependency; install only if you need structured scanning (the core RedactWire package stays free of it).</Description>
+    <Copyright>Copyright 2026 Adam Yang, Object IT Limited, Auckland, NZ</Copyright>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/adamy/RedactWire</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/adamy/RedactWire</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>pii;pii-detection;redaction;privacy;json;xml;structured;jsonpath;xpath;data-protection;dotnet</PackageTags>
+    <PackageReadmeFile>nuget.md</PackageReadmeFile>
+    <PackageReleaseNotes>0.4.0 — New add-on holding RedactWire's structured scanning (JSON/XML/object), split out of core so string-only users don't pull System.Text.Json. Requires the RedactWire package (pulled in automatically). Call detector.DetectJson/DetectXml/DetectObject or Redactor.Default.DetectJson(...).</PackageReleaseNotes>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RedactWire\RedactWire.csproj" />
+    <PackageReference Include="System.Text.Json" Version="10.0.9" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="nuget.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>

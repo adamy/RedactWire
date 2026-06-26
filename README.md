@@ -37,9 +37,9 @@ that drives overlap resolution.
 - **Severity model** (`Critical > High > Medium > Low`): the primary key for overlap
   resolution — a higher-severity match wins over an overlapping lower-severity one,
   even at lower confidence.
-- **Structured scanning:** detect PII inside **JSON**, **XML**, and **object graphs**,
-  with each hit located by JSONPath / XPath / property path. Standard libraries only
-  (`System.Text.Json`, `System.Xml`, reflection); XML is parsed safely (no XXE).
+- **Structured scanning** (opt-in **`RedactWire.Structured`** add-on): detect PII inside
+  **JSON**, **XML**, and **object graphs**, each hit located by JSONPath / XPath / property
+  path. Kept out of core so plain-string users don't pull `System.Text.Json`.
 - **Redaction:** mask (length-preserving), remove, type-label, or a custom replacement.
 - **Honest "no PII":** a requested culture with no rule pack is flagged
   `Supported = false` instead of silently "passing".
@@ -180,17 +180,26 @@ strings need entropy/context and are a later phase. See [`docs/rules/secrets.md`
 
 ## Structured scanning (JSON / XML / objects)
 
-Scan structured data and get each match with its location. Available on `PiiDetector`
-(and the static `Redactor`).
+Add-on package — keeps `System.Text.Json` out of the core:
+
+```bash
+dotnet add package RedactWire.Structured
+```
+
+Scan structured data and get each match with its location. `DetectJson/DetectXml/DetectObject`
+are extension methods on `PiiDetector`, so they light up once the add-on is referenced
+(use `Redactor.Default.DetectJson(...)` for the shared static detector).
 
 ```csharp
-foreach (var h in Redactor.DetectJson("""{"user":{"email":"a@b.com"},"ssn":"123-45-6789"}"""))
+var detector = PiiDetectorBuilder.CreateDefault().AddCulture(new CultureInfo("en-US")).Build();
+
+foreach (var h in detector.DetectJson("""{"user":{"email":"a@b.com"},"ssn":"123-45-6789"}"""))
     Console.WriteLine($"{h.Path}: {h.Match.Type}");
 // $.user.email: Email
 // $.ssn: SocialSecurity
 
-Redactor.DetectXml("<u email=\"a@b.com\"/>");   // -> /u/@email
-Redactor.DetectObject(myPoco);                  // -> User.Contacts[0].Phone
+detector.DetectXml("<u email=\"a@b.com\"/>");   // -> /u/@email
+detector.DetectObject(myPoco);                  // -> User.Contacts[0].Phone
 ```
 
 Notes:
@@ -198,8 +207,8 @@ Notes:
 - XML is parsed with DTD processing prohibited and no external resolver — **XXE-safe**.
 - Object scanning walks public properties/fields, handles collections/dictionaries,
   detects cycles, caps depth, and does not recurse into framework types.
-- `System.Text.Json` is built into modern .NET; on `netstandard2.0`/.NET Framework it
-  comes as a NuGet dependency (the library multi-targets so net8+ stays clean).
+- The add-on uses `System.Text.Json` (JSON) and BCL `System.Xml` / reflection (XML, objects).
+  This is the only reason `System.Text.Json` is split out of the core package.
 
 ## Extending
 
@@ -284,7 +293,8 @@ yield return new RuleHit(value, start, length, 0.9,
 
 | Path | What |
 |---|---|
-| `src/RedactWire` | the library (+ DI bootstrap) |
+| `src/RedactWire` | the core library (detection / validation / redaction + DI bootstrap) |
+| `src/RedactWire.Structured` | JSON/XML/object scanning add-on (`System.Text.Json`) |
 | `src/RedactWire.Cli` | command-line scanner / redactor |
 | `samples/RedactWire.Sample.Web` | ASP.NET Core Razor Pages PII tester |
 | `tests/RedactWire.Tests` | xUnit tests |

@@ -14,7 +14,7 @@
   <!-- ── NuGet package metadata ─────────────────────────────────────────────── -->
   <PropertyGroup>
     <PackageId>RedactWire</PackageId>
-    <Version>0.3.0</Version>
+    <Version>0.4.0</Version>
     <Authors>Adam Yang</Authors>
     <Company>Object IT Limited</Company>
     <Product>RedactWire</Product>
@@ -28,6 +28,7 @@
          GitHub topics can't hold these, so they live here only). -->
     <PackageTags>pii;pii-detection;privacy;gdpr;ccpa;hipaa;redaction;data-masking;anonymization;tokenization;dlp;compliance;data-protection;secret-detection;secret-scanning;secrets;api-key;credentials;jwt;openai;aws;dotnet;csharp;netstandard;national-id;tax-id;passport;phone-number;creditcard;iban;ssn;sin;nino;tfn;medicare;ird;nric;mykad;aadhaar;pan;cpf;cnpj;curp;rfc;steuer-id;nir;bsn;dni;codice-fiscale;nif;pesel;personnummer;hetu;cpr;rrn;my-number;hkid;身份证;居民身份证;マイナンバー;個人番号;주민등록번호;身分證;香港身份證;ИНН;СНИЛС;บัตรประชาชน;ΑΦΜ;ΑΜΚΑ;आधार;cccd</PackageTags>
     <PackageReadmeFile>nuget.md</PackageReadmeFile>
+    <PackageReleaseNotes>0.4.0 — BREAKING: structured scanning (JSON/XML/object) moved to the new RedactWire.Structured package; core no longer depends on System.Text.Json. Redactor.DetectJson/DetectXml/DetectObject removed — reference RedactWire.Structured and call Redactor.Default.DetectJson(...) or detector.DetectJson(...). Added: secret detection (AddSecretDetection), remove/replace built-in rules, region-based culture resolution. See CHANGELOG.md.</PackageReleaseNotes>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
@@ -37,7 +38,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.9" />
-    <PackageReference Include="System.Text.Json" Version="10.0.9" />
   </ItemGroup>
 
   <ItemGroup>

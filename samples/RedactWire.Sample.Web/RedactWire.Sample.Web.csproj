@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\RedactWire\RedactWire.csproj" />
+    <ProjectReference Include="..\..\src\RedactWire.Structured\RedactWire.Structured.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
