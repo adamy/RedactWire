@@ -1,0 +1,62 @@
+@* SPDX-License-Identifier: Apache-2.0 *@
+@* Copyright 2026 Adam Yang, Object IT Limited, Auckland, NZ *@
+@page
+@model StructuredJsonModel
+@{
+    ViewData["Title"] = "RedactWire — JSON scan";
+}
+
+<h1 class="h3 mb-3">Structured scan — JSON</h1>
+<p class="text-muted">
+    <code>RedactWire.Structured</code> add-on: <code>detector.DetectJson(...)</code> locates
+    each PII hit by JSONPath.
+</p>
+
+<form method="post">
+    <div class="row g-2 align-items-end mb-2">
+        <div class="col-auto">
+            <label class="form-label mb-0" for="Culture">Culture</label>
+            <select class="form-select form-select-sm" id="Culture" name="Culture">
+                @foreach (var c in StructuredJsonModel.Cultures)
+                {
+                    <option value="@c" selected="@(c == Model.Culture)">@c</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="mb-3">
+        <textarea class="form-control font-monospace" id="Input" name="Input" rows="10">@Model.Input</textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Scan JSON</button>
+</form>
+
+@if (Model.Error is not null)
+{
+    <div class="alert alert-danger mt-3 py-2">@Model.Error</div>
+}
+
+@if (Model.Results is not null)
+{
+    <hr />
+    <p><strong>@Model.Results.Count match(es)</strong></p>
+    @if (Model.Results.Count > 0)
+    {
+        <table class="table table-sm table-striped">
+            <thead>
+                <tr><th>Path (JSONPath)</th><th>Type</th><th>Value</th><th>Severity</th><th>Conf</th></tr>
+            </thead>
+            <tbody>
+            @foreach (var h in Model.Results.OrderBy(h => h.Path))
+            {
+                <tr>
+                    <td><code>@h.Path</code></td>
+                    <td>@(h.Match.Subtype ?? h.Match.Type.ToString())</td>
+                    <td><code>@h.Match.Value</code></td>
+                    <td>@h.Match.Severity</td>
+                    <td>@h.Match.Confidence.ToString("0.00")</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+}
