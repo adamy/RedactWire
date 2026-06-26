@@ -5,9 +5,9 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Package version (e.g. 0.2.0)'
+        description: 'Package version (e.g. 0.4.0)'
         required: true
-        default: '0.2.0'
+        default: '0.4.0'
 
 permissions:
   contents: write   # create the GitHub Release

@@ -13,7 +13,7 @@
   <!-- ── NuGet package metadata ─────────────────────────────────────────────── -->
   <PropertyGroup>
     <PackageId>RedactWire.Structured</PackageId>
-    <Version>0.3.0</Version>
+    <Version>0.4.0</Version>
     <Authors>Adam Yang</Authors>
     <Company>Object IT Limited</Company>
     <Product>RedactWire</Product>
